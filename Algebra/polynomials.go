@@ -88,6 +88,7 @@ func PolynonialDerivitive(a Polynomial) Polynomial {
 }
 func PolynomialIntegrate(a Polynomial) (error, Polynomial) {
 	out := a.Clone()
+	err := error(nil)
 	for i := 0; i < len(a.data); i++ {
 		if a.data[i].pow != -1 {
 			out.data[i].coef = a.data[i].coef / complex(float64(a.data[i].pow+1), 0)
@@ -95,8 +96,8 @@ func PolynomialIntegrate(a Polynomial) (error, Polynomial) {
 		} else {
 			out.data[i].coef = 0
 			out.data[i].pow = 0
-			return errors.New("illegal function ln"), out
+			err = errors.New("error unsupported function type \"natural log\"")
 		}
 	}
-	return nil, out
+	return err, out
 }

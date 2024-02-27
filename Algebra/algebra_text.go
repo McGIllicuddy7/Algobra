@@ -28,8 +28,6 @@ func (this *Polynomial) ToString() string {
 		if i < len(this.data)-1 {
 			if imag(this.data[i+1].coef) != 0 || real(this.data[i+1].coef) > 0 {
 				out += "+"
-			} else {
-				out += "-"
 			}
 		}
 	}

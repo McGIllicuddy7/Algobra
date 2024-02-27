@@ -22,16 +22,18 @@ func print_ints(arr []int) {
 	}
 }
 func main() {
-	v := algebra.ParsePolynomial("x^-2")
-	q := algebra.ParsePolynomial("x")
+	v := algebra.ParsePolynomial("x-2")
+	q := algebra.ParsePolynomial("x+3")
 	v = algebra.PolynomialMult(v, q)
-	println(v.ToString())
+	str := v.ToString()
+	println("(x-2)(x+3) =", str)
 	err, v := algebra.PolynomialIntegrate(v)
 	if err != nil {
 		println(err.Error())
 	}
-	println(v.ToString())
+	str2 := v.ToString()
+	println("integral(", str, ") = ", str2)
 	v = algebra.PolynonialDerivitive(v)
-	println(v.ToString())
+	println("derivitive(", str2, ") = ", v.ToString())
 	return
 }

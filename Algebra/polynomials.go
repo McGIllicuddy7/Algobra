@@ -2,6 +2,7 @@ package algebra
 
 import (
 	"errors"
+	"math/cmplx"
 	"matrix/utils"
 )
 
@@ -57,6 +58,15 @@ func PolynomialAdd(a Polynomial, b Polynomial) Polynomial {
 	out.compress()
 	return out
 }
+func PolynomialSub(a Polynomial, b Polynomial) Polynomial {
+	var out Polynomial
+	tmp := PolynomialScale(b, -1)
+	out.data = make([]polycule, 0)
+	out.data = append(out.data, a.data...)
+	out.data = append(out.data, tmp.data...)
+	out.compress()
+	return out
+}
 func polyculeMultByPolynomial(a Polynomial, b polycule) Polynomial {
 	out := a.Clone()
 	for i := 0; i < len(out.data); i++ {
@@ -72,6 +82,18 @@ func PolynomialMult(a Polynomial, b Polynomial) Polynomial {
 	}
 	out.compress()
 	return out
+}
+func PolynomialScale(a Polynomial, s complex128) Polynomial {
+	out := a.Clone()
+	for i := 0; i < len(a.data); i++ {
+		out.data[i].coef *= s
+	}
+	return out
+}
+func PolynomialScaleInplace(a Polynomial, s complex128) {
+	for i := 0; i < len(a.data); i++ {
+		a.data[i].coef *= s
+	}
 }
 func PolynonialDerivitive(a Polynomial) Polynomial {
 	out := a.Clone()
@@ -100,4 +122,14 @@ func PolynomialIntegrate(a Polynomial) (error, Polynomial) {
 		}
 	}
 	return err, out
+}
+func polycule_evaluate(p polycule, x complex128) complex128 {
+	return p.coef * cmplx.Pow(x, complex(float64(p.pow), 0))
+}
+func PolynomialEvalulate(a Polynomial, x complex128) complex128 {
+	total := complex128(0)
+	for i := 0; i < len(a.data); i++ {
+		total += polycule_evaluate(a.data[i], x)
+	}
+	return total
 }

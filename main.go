@@ -24,8 +24,11 @@ func print_ints(arr []int) {
 func main() {
 	v := algebra.ParsePolynomial("x+2")
 	q := algebra.ParsePolynomial("x+2")
-	println(q.ToString())
 	v = algebra.PolynomialMult(v, q)
+	println(v.ToString())
+	_, v = algebra.PolynomialIntegrate(v)
+	println(v.ToString())
+	v = algebra.PolynonialDerivitive(v)
 	println(v.ToString())
 	return
 }

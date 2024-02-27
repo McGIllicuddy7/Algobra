@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"math/rand"
-	algebra "matrix/Algebra"
+	"matrix/LA"
 )
 
 func make_ints(amnt int) []int {
@@ -22,18 +22,10 @@ func print_ints(arr []int) {
 	}
 }
 func main() {
-	v := algebra.ParsePolynomial("x-2")
-	q := algebra.ParsePolynomial("x+3")
-	v = algebra.PolynomialMult(v, q)
-	str := v.ToString()
-	println("(x-2)(x+3) =", str)
-	err, v := algebra.PolynomialIntegrate(v)
-	if err != nil {
-		println(err.Error())
-	}
-	str2 := v.ToString()
-	println("integral(", str, ") = ", str2)
-	v = algebra.PolynonialDerivitive(v)
-	println("derivitive(", str2, ") = ", v.ToString())
+	v := LA.RandomMatrix(2, 2)
+	q := v.ToEigenMatrix()
+	u := q.CharacteristicPolynomial()
+	println(q.ToString())
+	println(u.ToString())
 	return
 }

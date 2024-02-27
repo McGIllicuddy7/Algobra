@@ -87,3 +87,22 @@ func FormatComplex(c complex128) string {
 	}
 	return out
 }
+func normalize_strlen(str string, length int) string {
+	for len(str) < length {
+		str += " "
+	}
+	return str
+}
+func NormalizeStrlens(in []string) []string {
+	max := 0
+	for i := 0; i < len(in); i++ {
+		if len(in[i]) > max {
+			max = len(in[i])
+		}
+	}
+	out := make([]string, len(in))
+	for i := 0; i < len(in); i++ {
+		out[i] = normalize_strlen(in[i], max)
+	}
+	return out
+}

@@ -133,3 +133,25 @@ func PolynomialEvalulate(a Polynomial, x complex128) complex128 {
 	}
 	return total
 }
+func RealPoly(addval float64, coef float64, pow int) Polynomial {
+	out := Polynomial{make([]polycule, 0)}
+	v1 := polycule{complex(addval, 0), 0}
+	v2 := polycule{complex(coef, 0), pow}
+	out.addPolycule(v1)
+	out.addPolycule(v2)
+	out.compress()
+	return out
+}
+func CompPoly(addval complex128, coef complex128, pow int) Polynomial {
+	out := Polynomial{make([]polycule, 0)}
+	v1 := polycule{addval, 0}
+	v2 := polycule{coef, pow}
+	out.addPolycule(v1)
+	out.addPolycule(v2)
+	out.compress()
+	return out
+}
+func (this *Polynomial) Add(p Polynomial) {
+	this.data = append(this.data, p.data...)
+	this.compress()
+}

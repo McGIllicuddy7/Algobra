@@ -2,6 +2,7 @@ package LA
 
 import (
 	"math/cmplx"
+	"math/rand"
 	"matrix/utils"
 )
 
@@ -291,5 +292,17 @@ func (this *Matrix) Determinant() complex128 {
 }
 func (this *Matrix) Inverse() Matrix {
 	_, out := MatrixPairRowReduce(*this, Identity(this.width))
+	return out
+}
+func RandomMatrix(height int, width int) Matrix {
+	var out Matrix
+	out.data = make([]complex128, height*width)
+	out.height = height
+	out.width = width
+	for y := 0; y < height; y++ {
+		for x := 0; x < width; x++ {
+			out.Set(x, y, complex(float64(rand.Int31()%100), 0))
+		}
+	}
 	return out
 }

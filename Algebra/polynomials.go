@@ -34,6 +34,14 @@ func polyculeMlt(a polycule, b polycule) polycule {
 func (this *Polynomial) addPolycule(p polycule) {
 	this.data = append(this.data, p)
 }
+func slice_contains(data []int, value int) bool {
+	for i := 0; i < len(data); i++ {
+		if data[i] == value {
+			return true
+		}
+	}
+	return false
+}
 func (this *Polynomial) compress() {
 	utils.SortInplace[polycule](this.data, polycule_cmp)
 	v := this.data[0].pow

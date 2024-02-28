@@ -5,15 +5,15 @@ import (
 	"sync/atomic"
 )
 
-type Autopsy struct {
+type autopsy struct {
 	info []string
 }
 
-var aut Autopsy
+var aut autopsy
 var key atomic.Bool
 
 func Init() {
-	aut = Autopsy{make([]string, 0)}
+	aut = autopsy{make([]string, 0)}
 	key.Store(false)
 }
 func key_wait() {
@@ -27,7 +27,7 @@ func key_release() {
 }
 func Reset() {
 	key_wait()
-	aut = Autopsy{make([]string, 0)}
+	aut = autopsy{make([]string, 0)}
 	key_release()
 }
 func Store(msg string) {

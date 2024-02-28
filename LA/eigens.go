@@ -2,6 +2,7 @@ package LA
 
 import (
 	al "matrix/Algebra"
+	autopsy "matrix/Autopsy"
 	"matrix/utils"
 )
 
@@ -79,7 +80,6 @@ func (this *PolyMatrix) elimRowCollumn(idx int) PolyMatrix {
 }
 func (this PolyMatrix) CharacteristicPolynomial() al.Polynomial {
 	if this.width == 2 && this.height == 2 {
-		//print(this.ToString())
 		a := this.Get(0, 0)
 		b := this.Get(0, 1)
 		c := this.Get(1, 0)
@@ -87,19 +87,24 @@ func (this PolyMatrix) CharacteristicPolynomial() al.Polynomial {
 		ad := al.PolynomialMult(a, d)
 		bc := al.PolynomialMult(b, c)
 		ret := al.PolynomialSub(ad, bc)
-		//println(ad.ToString(), bc.ToString(), ret.ToString())
-		//print("\n")
 		return ret
 	}
 	var out al.Polynomial
 	for i := 0; i < this.width; i++ {
 		tmp := this.elimRowCollumn(i)
 		m := this.Get(i, 0)
-		mdet := al.PolynomialMult(m, tmp.CharacteristicPolynomial())
+		det := tmp.CharacteristicPolynomial()
+		mdet := al.PolynomialMult(m, det)
 		if i%2 == 0 {
+			if this.height == 4 {
+				autopsy.Store(m.ToString() + " * " + det.ToString() + " = " + mdet.ToString())
+			}
 			out = al.PolynomialAdd(out, mdet)
 		} else {
 			mdet = al.PolynomialScale(mdet, -1)
+			if this.height == 4 {
+				autopsy.Store(m.ToString() + " * " + det.ToString() + " = " + mdet.ToString())
+			}
 			out = al.PolynomialAdd(out, mdet)
 		}
 	}

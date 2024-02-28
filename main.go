@@ -2,11 +2,10 @@ package main
 
 import (
 	"fmt"
-	"math"
 	"math/rand"
 	autopsy "matrix/Autopsy"
-	"matrix/LA"
-	"matrix/utils"
+	La "matrix/La"
+	fr "matrix/fractions"
 	"os"
 )
 
@@ -29,24 +28,18 @@ func main() {
 	//v := LA.MatrixFromInts([][]int{{1, 1, 4}, {7, 9, 3}, {6, 4, 6}})
 	//v := LA.RandomMatrix(3, 3)
 	autopsy.Init()
-	for i := 0; i < 1000000; i++ {
-		v := LA.RandomMatrix(4, 4)
+	for i := 0; i < 100000; i++ {
+		v := La.RandomMatrix(4, 4)
 		v1 := v.Determinant()
-		tmp := v.ToPolyMatrix().CharacteristicPolynomial()
-		v2 := tmp.ZeroCoef()
-		if math.Round(real(v1)) != math.Round(real(v2)) {
-			fmt.Printf("\nfailed at i = %d\n matrix:\n%s", i, v.ToString())
-			fmt.Printf("guassian determinant: %s != recursion determinant: %s\n", utils.FormatComplex(v1), utils.FormatComplex(v2))
-			autopsy.Dump()
+		u := v.ToPolyMatrix()
+		t := u.CharacteristicPolynomial()
+		if !fr.Equals(t.ZeroCoef(), v1) {
+			println("failed\n")
+			println(v.ToString())
+			println(t.ToString())
+			println(v1.ToString())
 			os.Exit(1)
 		}
-		if i%1000 == -1 {
-			print(v.ToString())
-			println("detertminant from guass jordan: ", real(v1))
-			println("determinant from recursive: ", real(v2))
-		}
-		autopsy.Reset()
-
 	}
 	println("success")
 	return

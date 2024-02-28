@@ -1,12 +1,11 @@
 package algebra
 
 import (
-	"errors"
-	"math/cmplx"
+	fr "matrix/fractions"
 )
 
 type polycule struct {
-	coef complex128
+	coef fr.Fraction
 	pow  int
 }
 type Polynomial struct {
@@ -28,7 +27,7 @@ func polycule_cmp(a polycule, b polycule) int {
 	return 0
 }
 func polyculeMlt(a polycule, b polycule) polycule {
-	return polycule{a.coef * b.coef, a.pow + b.pow}
+	return polycule{fr.Mult(a.coef, b.coef), a.pow + b.pow}
 }
 func (this *Polynomial) addPolycule(p polycule) {
 	this.data = append(this.data, p)
@@ -53,17 +52,17 @@ func (this *Polynomial) compress() {
 		}
 	}
 	for i := 0; i < len(powers); i++ {
-		p := polycule{0, powers[i]}
+		p := polycule{fr.NewFrac(0, 1), powers[i]}
 		for j := 0; j < len(this.data); j++ {
 			if this.data[j].pow == powers[i] {
-				p.coef += this.data[j].coef
+				p.coef = fr.Add(p.coef, this.data[j].coef)
 			}
 		}
 		new_data = append(new_data, p)
 	}
 	this.data = new_data
 }
-func (this Polynomial) ZeroCoef() complex128 {
+func (this Polynomial) ZeroCoef() fr.Fraction {
 	return this.data[0].coef
 }
 func PolynomialAdd(a Polynomial, b Polynomial) Polynomial {
@@ -76,7 +75,7 @@ func PolynomialAdd(a Polynomial, b Polynomial) Polynomial {
 }
 func PolynomialSub(a Polynomial, b Polynomial) Polynomial {
 	var out Polynomial
-	tmp := PolynomialScale(b, -1)
+	tmp := PolynomialScale(b, fr.NewFrac(-1, 1))
 	out.data = make([]polycule, 0)
 	out.data = append(out.data, a.data...)
 	out.data = append(out.data, tmp.data...)
@@ -99,71 +98,21 @@ func PolynomialMult(a Polynomial, b Polynomial) Polynomial {
 	out.compress()
 	return out
 }
-func PolynomialScale(a Polynomial, s complex128) Polynomial {
+func PolynomialScale(a Polynomial, s fr.Fraction) Polynomial {
 	out := a.Clone()
 	for i := 0; i < len(a.data); i++ {
-		out.data[i].coef = a.data[i].coef * s
+		out.data[i].coef = fr.Mult(a.data[i].coef, s)
 	}
 	return out
 }
-func PolynomialScaleInplace(a Polynomial, s complex128) {
+func PolynomialScaleInplace(a Polynomial, s fr.Fraction) {
 	for i := 0; i < len(a.data); i++ {
-		a.data[i].coef *= s
+		a.data[i].coef = fr.Mult(a.data[i].coef, s)
 	}
 }
-func PolynonialDerivitive(a Polynomial) Polynomial {
-	out := a.Clone()
-	for i := 0; i < len(a.data); i++ {
-		if a.data[i].pow != 0 {
-			out.data[i].coef = a.data[i].coef * complex(float64(a.data[i].pow), 0)
-			out.data[i].pow = a.data[i].pow - 1
-		} else {
-			out.data[i].coef = 0
-			out.data[i].pow = 0
-		}
-	}
-	return out
+func NewPoly(coef fr.Fraction, pow int) Polynomial {
+	return Polynomial{[]polycule{{coef, pow}}}
 }
-func PolynomialIntegrate(a Polynomial) (error, Polynomial) {
-	out := a.Clone()
-	err := error(nil)
-	for i := 0; i < len(a.data); i++ {
-		if a.data[i].pow != -1 {
-			out.data[i].coef = a.data[i].coef / complex(float64(a.data[i].pow+1), 0)
-			out.data[i].pow = a.data[i].pow + 1
-		} else {
-			out.data[i].coef = 0
-			out.data[i].pow = 0
-			err = errors.New("error unsupported function type \"natural log\"")
-		}
-	}
-	return err, out
-}
-func polycule_evaluate(p polycule, x complex128) complex128 {
-	return p.coef * cmplx.Pow(x, complex(float64(p.pow), 0))
-}
-func PolynomialEvalulate(a Polynomial, x complex128) complex128 {
-	total := complex128(0)
-	for i := 0; i < len(a.data); i++ {
-		total += polycule_evaluate(a.data[i], x)
-	}
-	return total
-}
-func RealPoly(addval float64, coef float64, pow int) Polynomial {
-	out := Polynomial{make([]polycule, 0)}
-	v1 := polycule{complex(addval, 0), 0}
-	v2 := polycule{complex(coef, 0), pow}
-	out.addPolycule(v1)
-	out.addPolycule(v2)
-	out.compress()
-	return out
-}
-func CompPoly(addval complex128, coef complex128, pow int) Polynomial {
-	out := Polynomial{make([]polycule, 0)}
-	v1 := polycule{addval, 0}
-	v2 := polycule{coef, pow}
-	out.addPolycule(v1)
-	out.addPolycule(v2)
-	out.compress()
-	return out
+func CompPoly(coef fr.Fraction, ceof2 fr.Fraction, pow int) Polynomial {
+	return Polynomial{[]polycule{{coef, 0}, {ceof2, pow}}}
 }

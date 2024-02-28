@@ -1,7 +1,8 @@
-package LA
+package La
 
 import (
 	al "matrix/Algebra"
+	fr "matrix/fractions"
 	"matrix/utils"
 )
 
@@ -41,9 +42,9 @@ func (this *Matrix) ToEigenMatrix() PolyMatrix {
 		for x := 0; x < this.width; x++ {
 			var v al.Polynomial
 			if x == y {
-				v = al.CompPoly(this.Get(x, y), -1, 1)
+				v = al.CompPoly(this.Get(x, y), fr.NewFrac(-1, 1), 1)
 			} else {
-				v = al.CompPoly(this.Get(x, y), 0, 0)
+				v = al.CompPoly(this.Get(x, y), fr.NewFrac(0, 1), 0)
 			}
 			out.Set(x, y, v)
 		}
@@ -54,14 +55,14 @@ func (this *Matrix) ToPolyMatrix() PolyMatrix {
 	out := PolyMatrix{make([]al.Polynomial, this.height*this.width), this.height, this.width}
 	for y := 0; y < this.height; y++ {
 		for x := 0; x < this.width; x++ {
-			v := al.CompPoly(this.Get(x, y), 0, 0)
+			v := al.CompPoly(this.Get(x, y), fr.NewFrac(0, 1), 0)
 			out.Set(x, y, v)
 		}
 	}
 	return out
 }
 func (this *PolyMatrix) ToMatrix() Matrix {
-	out := Matrix{make([]complex128, this.height*this.width), this.height, this.width}
+	out := Matrix{make([]fr.Fraction, this.height*this.width), this.height, this.width}
 	for y := 0; y < this.height; y++ {
 		for x := 0; x < this.width; x++ {
 			v := this.Get(x, y).ZeroCoef()
@@ -108,7 +109,7 @@ func (this PolyMatrix) CharacteristicPolynomial() al.Polynomial {
 		if i%2 == 0 {
 			out = al.PolynomialAdd(out, mdet)
 		} else {
-			mdet = al.PolynomialScale(mdet, -1)
+			mdet = al.PolynomialScale(mdet, fr.NewFrac(-1, 1))
 			out = al.PolynomialAdd(out, mdet)
 		}
 	}

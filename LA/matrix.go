@@ -1,75 +1,20 @@
-package LA
+package La
 
 import (
-	"math/cmplx"
 	"math/rand"
-	"matrix/utils"
+	fr "matrix/fractions"
 )
 
 type Matrix struct {
-	data   []complex128
+	data   []fr.Fraction
 	height int
 	width  int
 }
-type Vector []complex128
 
-func MatrixFromInts(data [][]int) Matrix {
-	height := len(data)
-	width := len(data[0])
-	out := Matrix{make([]complex128, height*width), height, width}
-	for y := 0; y < height; y++ {
-		for x := 0; x < width; x++ {
-			out.Set(x, y, complex(float64(data[y][x]), 0))
-		}
-	}
-	return out
-}
-func MatrixFromFloats(data [][]float64) Matrix {
-	height := len(data)
-	width := len(data[0])
-	out := Matrix{make([]complex128, height*width), height, width}
-	for y := 0; y < height; y++ {
-		for x := 0; x < width; x++ {
-			out.Set(x, y, complex(data[y][x], 0))
-		}
-	}
-	return out
-}
-func VectorAdd(v0 Vector, v1 Vector) Vector {
-	out := make([]complex128, len(v0))
-	for i := 0; i < len(v0); i++ {
-		out[i] = v0[i] + v1[i]
-	}
-	return out
-}
-func VectorScale(v0 Vector, v1 Vector) Vector {
-	out := make([]complex128, len(v0))
-	for i := 0; i < len(v0); i++ {
-		out[i] = v0[i] - v1[i]
-	}
-	return out
-}
-func VectorMlt(v0 Vector, s complex128) Vector {
-	out := make(Vector, len(v0))
-	for i := 0; i < len(v0); i++ {
-		out[i] = v0[i] * s
-	}
-	return out
-}
-func VectorDot(v0 Vector, v1 Vector) complex128 {
-	out := complex128(0)
-	for i := 0; i < len(v0); i++ {
-		out += v0[i] * v1[i]
-	}
-	return out
-}
-func vector_length(v0 Vector) complex128 {
-	return cmplx.Sqrt(VectorDot(v0, v0))
-}
-func (this *Matrix) Get(x int, y int) complex128 {
+func (this *Matrix) Get(x int, y int) fr.Fraction {
 	return this.data[y*this.width+x]
 }
-func (this *Matrix) Set(x int, y int, v complex128) {
+func (this *Matrix) Set(x int, y int, v fr.Fraction) {
 	this.data[y*this.width+x] = v
 }
 func (this *Matrix) NumCols() int {
@@ -79,7 +24,7 @@ func (this *Matrix) NumRows() int {
 	return this.height
 }
 func (this *Matrix) Clone() Matrix {
-	out := Matrix{make([]complex128, len(this.data)), this.height, this.width}
+	out := Matrix{make([]fr.Fraction, len(this.data)), this.height, this.width}
 	for i := 0; i < len(this.data); i++ {
 		out.data[i] = this.data[i]
 	}
@@ -90,7 +35,7 @@ func (this *Matrix) ToString() string {
 	out_strs := make([]string, 0, this.height*this.width)
 	for j := 0; j < this.height; j++ {
 		for i := 0; i < this.width; i++ {
-			out_strs = append(out_strs, utils.FormatComplex(this.Get(i, j)))
+			out_strs = append(out_strs, this.Get(i, j).ToString())
 		}
 	}
 	max := 0
@@ -128,28 +73,28 @@ func (this *Matrix) SwapRows(r0 int, r1 int) {
 }
 
 // adds r0 to r1 scaled by s
-func (this *Matrix) AddRows(r0 int, r1 int, s complex128) {
+func (this *Matrix) AddRows(r0 int, r1 int, s fr.Fraction) {
 	for i := 0; i < this.width; i++ {
-		tmp0 := this.Get(i, r0) * s
-		this.Set(i, r1, tmp0+this.Get(i, r1))
+		tmp0 := fr.Mult(this.Get(i, r0), s)
+		this.Set(i, r1, fr.Add(tmp0, this.Get(i, r1)))
 	}
 }
-func (this *Matrix) SubRows(r0 int, r1 int, s complex128) {
+func (this *Matrix) SubRows(r0 int, r1 int, s fr.Fraction) {
 	for i := 0; i < this.width; i++ {
-		tmp0 := this.Get(i, r0) * s
-		this.Set(i, r1, this.Get(i, r1)-tmp0)
+		tmp0 := fr.Mult(this.Get(i, r0), s)
+		this.Set(i, r1, fr.Sub(this.Get(i, r1), tmp0))
 	}
 }
-func (this *Matrix) ScaleRow(r0 int, s complex128) {
+func (this *Matrix) ScaleRow(r0 int, s fr.Fraction) {
 	for i := 0; i < this.width; i++ {
-		tmp0 := this.Get(i, r0) * s
+		tmp0 := fr.Mult(this.Get(i, r0), s)
 		this.Set(i, r0, tmp0)
 	}
 }
 func Identity(n int) Matrix {
-	out := Matrix{make([]complex128, n*n), n, n}
+	out := Matrix{make([]fr.Fraction, n*n), n, n}
 	for i := 0; i < n; i++ {
-		out.Set(i, i, 1)
+		out.Set(i, i, fr.NewFrac(1, 1))
 	}
 	return out
 }
@@ -157,10 +102,10 @@ func MatrixAdd(m0 Matrix, m1 Matrix) Matrix {
 	if m0.height != m1.height || m0.width != m1.width {
 		panic("error adding matrices without the same dimension")
 	}
-	out := Matrix{make([]complex128, m0.height*m0.width), m0.height, m0.width}
+	out := Matrix{make([]fr.Fraction, m0.height*m0.width), m0.height, m0.width}
 	for i := 0; i < m0.height; i++ {
 		for j := 0; j < m0.width; j++ {
-			out.Set(j, i, m0.Get(j, i)+m1.Get(j, i))
+			out.Set(j, i, fr.Add(m0.Get(j, i), m1.Get(j, i)))
 		}
 	}
 	return out
@@ -169,18 +114,18 @@ func MatrixSub(m0 Matrix, m1 Matrix) Matrix {
 	if m0.height != m1.height || m0.width != m1.width {
 		panic("error subtracting matrices without the same dimension")
 	}
-	out := Matrix{make([]complex128, m0.height*m0.width), m0.height, m0.width}
+	out := Matrix{make([]fr.Fraction, m0.height*m0.width), m0.height, m0.width}
 	for i := 0; i < m0.height; i++ {
 		for j := 0; j < m0.width; j++ {
-			out.Set(j, i, m1.Get(j, i)-m0.Get(j, i))
+			out.Set(j, i, fr.Sub(m1.Get(j, i), m0.Get(j, i)))
 		}
 	}
 	return out
 }
-func MatrixScale(m0 Matrix, s complex128) Matrix {
-	out := Matrix{make([]complex128, m0.height*m0.width), m0.height, m0.width}
+func MatrixScale(m0 Matrix, s fr.Fraction) Matrix {
+	out := Matrix{make([]fr.Fraction, m0.height*m0.width), m0.height, m0.width}
 	for i := 0; i < len(m0.data); i++ {
-		out.data[i] = out.data[i] * s
+		out.data[i] = fr.Mult(m0.data[i], s)
 	}
 	return out
 }
@@ -189,7 +134,7 @@ func MatrixRowReduce(matrx Matrix) Matrix {
 	for i := 0; i < mtrx.width; i++ {
 		r := i
 		degen := false
-		for mtrx.Get(i, r) == 0 {
+		for fr.Equals(mtrx.Get(i, r), fr.NewFrac(0, 1)) {
 			r++
 			if r >= mtrx.height {
 				degen = true
@@ -203,7 +148,7 @@ func MatrixRowReduce(matrx Matrix) Matrix {
 			mtrx.SwapRows(r, i)
 		}
 		v := mtrx.Get(i, i)
-		mtrx.ScaleRow(i, 1/v)
+		mtrx.ScaleRow(i, fr.Recip(v))
 		for j := 0; j < mtrx.height; j++ {
 			if j == i {
 				continue
@@ -220,7 +165,7 @@ func MatrixPairRowReduce(source Matrix, target Matrix) (Matrix, Matrix) {
 	for i := 0; i < mtrx.width; i++ {
 		r := i
 		degen := false
-		for mtrx.Get(i, r) == 0 {
+		for fr.Equals(mtrx.Get(i, r), fr.NewFrac(0, 1)) {
 			r++
 			if r >= mtrx.height {
 				degen = true
@@ -235,8 +180,8 @@ func MatrixPairRowReduce(source Matrix, target Matrix) (Matrix, Matrix) {
 			mtrx.SwapRows(r, i)
 		}
 		v := mtrx.Get(i, i)
-		mtrx.ScaleRow(i, 1/v)
-		out.ScaleRow(1, 1/v)
+		mtrx.ScaleRow(i, fr.Recip(v))
+		out.ScaleRow(1, fr.Recip(v))
 		for j := 0; j < mtrx.height; j++ {
 			if j == i {
 				continue
@@ -248,16 +193,16 @@ func MatrixPairRowReduce(source Matrix, target Matrix) (Matrix, Matrix) {
 	}
 	return mtrx, out
 }
-func (this *Matrix) Determinant() complex128 {
-	mtrx := Matrix{make([]complex128, len(this.data)), this.height, this.width}
-	out := complex(1, 0)
+func (this *Matrix) Determinant() fr.Fraction {
+	mtrx := Matrix{make([]fr.Fraction, len(this.data)), this.height, this.width}
+	out := fr.NewFrac(1, 1)
 	for i := 0; i < len(this.data); i++ {
 		mtrx.data[i] = this.data[i]
 	}
 	for i := 0; i < mtrx.width; i++ {
 		r := i
 		degen := false
-		for mtrx.Get(i, r) == 0 {
+		for fr.Equals(mtrx.Get(i, r), fr.NewFrac(0, 1)) {
 			r++
 			if r >= mtrx.height {
 				degen = true
@@ -265,28 +210,25 @@ func (this *Matrix) Determinant() complex128 {
 			}
 		}
 		if degen {
-			continue
+			return fr.NewFrac(0, 1)
 		}
 		if r != i {
 			mtrx.SwapRows(r, i)
-			out *= -1
+			out = fr.Scale(out, -1)
 		}
 		v := mtrx.Get(i, i)
-		mtrx.ScaleRow(i, 1/v)
-		out *= v
+		mtrx.ScaleRow(i, fr.Recip(v))
+		out = fr.Mult(out, v)
 		for j := 0; j < mtrx.height; j++ {
 			if j == i {
 				continue
 			}
 			mlt := mtrx.Get(i, j)
-			if mlt == 0 {
+			if fr.Equals(mlt, fr.NewFrac(0, 1)) {
 				continue
 			}
 			mtrx.SubRows(i, j, mlt)
 		}
-	}
-	for i := 0; i < this.width; i++ {
-		out *= mtrx.Get(i, i)
 	}
 	return out
 }
@@ -296,12 +238,12 @@ func (this *Matrix) Inverse() Matrix {
 }
 func RandomMatrix(height int, width int) Matrix {
 	var out Matrix
-	out.data = make([]complex128, height*width)
+	out.data = make([]fr.Fraction, height*width)
 	out.height = height
 	out.width = width
 	for y := 0; y < height; y++ {
 		for x := 0; x < width; x++ {
-			out.Set(x, y, complex(float64(rand.Int31()%10-5), 0))
+			out.Set(x, y, fr.NewFrac(int(rand.Int31()%10-5), 1))
 		}
 	}
 	return out

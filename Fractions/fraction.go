@@ -1,6 +1,9 @@
 package fractions
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
 type Fraction struct {
 	num int
@@ -63,4 +66,25 @@ func Recip(f0 Fraction) Fraction {
 }
 func Equals(f0 Fraction, f1 Fraction) bool {
 	return f0.num == f1.num && f1.den == f0.den
+}
+func (this Fraction) ToFloat() float64 {
+	return float64(this.num) / float64(this.den)
+}
+func (this Fraction) ToComplex() complex128 {
+	return complex(this.ToFloat(), 0)
+}
+func (this Fraction) ToInt() int {
+	return this.num / this.den
+}
+func FromFloat(v float64) Fraction {
+	f := v
+	count := 1
+	for f != math.Floor(f) {
+		f *= 10
+		count *= 10
+	}
+	return NewFrac(int(f), count)
+}
+func FromInt(v int) Fraction {
+	return NewFrac(v, 1)
 }

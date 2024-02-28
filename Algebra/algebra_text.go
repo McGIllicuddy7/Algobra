@@ -9,6 +9,7 @@ func (this *Polynomial) ToString() string {
 	for i := 0; i < len(this.data); i++ {
 		out += this.data[i].coef.ToString()
 		out += fmt.Sprintf("x^%d", this.data[i].pow)
+		out += "+"
 	}
 	return out
 }

@@ -94,7 +94,7 @@ func (this *Matrix) ScaleRow(r0 int, s fr.Fraction) {
 func Identity(n int) Matrix {
 	out := Matrix{make([]fr.Fraction, n*n), n, n}
 	for i := 0; i < n; i++ {
-		out.Set(i, i, fr.NewFrac(1, 1))
+		out.Set(i, i, fr.FromInt(1))
 	}
 	return out
 }
@@ -134,7 +134,7 @@ func MatrixRowReduce(matrx Matrix) Matrix {
 	for i := 0; i < mtrx.width; i++ {
 		r := i
 		degen := false
-		for fr.Equals(mtrx.Get(i, r), fr.NewFrac(0, 1)) {
+		for fr.Equals(mtrx.Get(i, r), fr.FromInt(0)) {
 			r++
 			if r >= mtrx.height {
 				degen = true
@@ -165,7 +165,7 @@ func MatrixPairRowReduce(source Matrix, target Matrix) (Matrix, Matrix) {
 	for i := 0; i < mtrx.width; i++ {
 		r := i
 		degen := false
-		for fr.Equals(mtrx.Get(i, r), fr.NewFrac(0, 1)) {
+		for fr.Equals(mtrx.Get(i, r), fr.FromInt(0)) {
 			r++
 			if r >= mtrx.height {
 				degen = true
@@ -195,14 +195,14 @@ func MatrixPairRowReduce(source Matrix, target Matrix) (Matrix, Matrix) {
 }
 func (this *Matrix) Determinant() fr.Fraction {
 	mtrx := Matrix{make([]fr.Fraction, len(this.data)), this.height, this.width}
-	out := fr.NewFrac(1, 1)
+	out := fr.FromInt(1)
 	for i := 0; i < len(this.data); i++ {
 		mtrx.data[i] = this.data[i]
 	}
 	for i := 0; i < mtrx.width; i++ {
 		r := i
 		degen := false
-		for fr.Equals(mtrx.Get(i, r), fr.NewFrac(0, 1)) {
+		for fr.Equals(mtrx.Get(i, r), fr.FromInt(0)) {
 			r++
 			if r >= mtrx.height {
 				degen = true
@@ -210,7 +210,7 @@ func (this *Matrix) Determinant() fr.Fraction {
 			}
 		}
 		if degen {
-			return fr.NewFrac(0, 1)
+			return fr.FromInt(0)
 		}
 		if r != i {
 			mtrx.SwapRows(r, i)
@@ -224,7 +224,7 @@ func (this *Matrix) Determinant() fr.Fraction {
 				continue
 			}
 			mlt := mtrx.Get(i, j)
-			if fr.Equals(mlt, fr.NewFrac(0, 1)) {
+			if fr.Equals(mlt, fr.FromInt(0)) {
 				continue
 			}
 			mtrx.SubRows(i, j, mlt)
@@ -243,7 +243,7 @@ func RandomMatrix(height int, width int) Matrix {
 	out.width = width
 	for y := 0; y < height; y++ {
 		for x := 0; x < width; x++ {
-			out.Set(x, y, fr.NewFrac(int(rand.Int31()%10-5), 1))
+			out.Set(x, y, fr.FromInt(int(rand.Int31()%10-5)))
 		}
 	}
 	return out

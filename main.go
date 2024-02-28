@@ -8,7 +8,6 @@ import (
 	"matrix/LA"
 	"matrix/utils"
 	"os"
-	"strconv"
 )
 
 func make_ints(amnt int) []int {
@@ -34,13 +33,9 @@ func main() {
 		v := LA.RandomMatrix(4, 4)
 		v1 := v.Determinant()
 		tmp := v.ToPolyMatrix().CharacteristicPolynomial()
-		v2, err := strconv.ParseComplex(tmp.ToString(), 128)
-		if err != nil {
-			println("failed\n")
-			os.Exit(1)
-		}
+		v2 := tmp.ZeroCoef()
 		if math.Round(real(v1)) != math.Round(real(v2)) {
-			fmt.Printf("\nfailed at i = %d \n matrix:\n%s", i, v.ToString())
+			fmt.Printf("\nfailed at i = %d\n matrix:\n%s", i, v.ToString())
 			fmt.Printf("guassian determinant: %s != recursion determinant: %s\n", utils.FormatComplex(v1), utils.FormatComplex(v2))
 			autopsy.Dump()
 			os.Exit(1)

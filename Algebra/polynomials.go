@@ -3,7 +3,6 @@ package algebra
 import (
 	"errors"
 	"math/cmplx"
-	"matrix/utils"
 )
 
 type polycule struct {
@@ -43,20 +42,29 @@ func slice_contains(data []int, value int) bool {
 	return false
 }
 func (this *Polynomial) compress() {
-	utils.SortInplace[polycule](this.data, polycule_cmp)
-	v := this.data[0].pow
+	if len(this.data) < 2 {
+		return
+	}
 	new_data := make([]polycule, 0)
-	counter := 0
-	new_data = append(new_data, polycule{0, this.data[counter].pow})
-	for counter < len(this.data) {
-		if this.data[counter].pow != v {
-			v = this.data[counter].pow
-			new_data = append(new_data, polycule{0, this.data[counter].pow})
+	powers := make([]int, 0)
+	for i := 0; i < len(this.data); i++ {
+		if !slice_contains(powers, this.data[i].pow) {
+			powers = append(powers, this.data[i].pow)
 		}
-		new_data[len(new_data)-1].coef += this.data[counter].coef
-		counter++
+	}
+	for i := 0; i < len(powers); i++ {
+		p := polycule{0, powers[i]}
+		for j := 0; j < len(this.data); j++ {
+			if this.data[j].pow == powers[i] {
+				p.coef += this.data[j].coef
+			}
+		}
+		new_data = append(new_data, p)
 	}
 	this.data = new_data
+}
+func (this Polynomial) ZeroCoef() complex128 {
+	return this.data[0].coef
 }
 func PolynomialAdd(a Polynomial, b Polynomial) Polynomial {
 	var out Polynomial

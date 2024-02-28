@@ -2,7 +2,6 @@ package LA
 
 import (
 	al "matrix/Algebra"
-	autopsy "matrix/Autopsy"
 	"matrix/utils"
 )
 
@@ -61,6 +60,16 @@ func (this *Matrix) ToPolyMatrix() PolyMatrix {
 	}
 	return out
 }
+func (this *PolyMatrix) ToMatrix() Matrix {
+	out := Matrix{make([]complex128, this.height*this.width), this.height, this.width}
+	for y := 0; y < this.height; y++ {
+		for x := 0; x < this.width; x++ {
+			v := this.Get(x, y).ZeroCoef()
+			out.Set(x, y, v)
+		}
+	}
+	return out
+}
 func (this *PolyMatrix) elimRowCollumn(idx int) PolyMatrix {
 	out := PolyMatrix{make([]al.Polynomial, (this.width-1)*(this.height-1)), this.height - 1, this.width - 1}
 	for y := 1; y < this.height; y++ {
@@ -78,6 +87,7 @@ func (this *PolyMatrix) elimRowCollumn(idx int) PolyMatrix {
 	}
 	return out
 }
+
 func (this PolyMatrix) CharacteristicPolynomial() al.Polynomial {
 	if this.width == 2 && this.height == 2 {
 		a := this.Get(0, 0)
@@ -87,6 +97,7 @@ func (this PolyMatrix) CharacteristicPolynomial() al.Polynomial {
 		ad := al.PolynomialMult(a, d)
 		bc := al.PolynomialMult(b, c)
 		ret := al.PolynomialSub(ad, bc)
+		///autopsy.Store(fmt.Sprintf("returning:%s", ret.ToString()))
 		return ret
 	}
 	var out al.Polynomial
@@ -94,19 +105,22 @@ func (this PolyMatrix) CharacteristicPolynomial() al.Polynomial {
 		tmp := this.elimRowCollumn(i)
 		m := this.Get(i, 0)
 		det := tmp.CharacteristicPolynomial()
+
+		//autopsy.Store(fmt.Sprintf("guass det: %f, recurse det:%f", real(matdet), real(dt)))
 		mdet := al.PolynomialMult(m, det)
 		if i%2 == 0 {
-			if this.height == 4 {
-				autopsy.Store(m.ToString() + " * " + det.ToString() + " = " + mdet.ToString())
+			if this.height < 5 {
+				//autopsy.Store(m.ToString() + " * " + det.ToString() + " = " + mdet.ToString())
 			}
 			out = al.PolynomialAdd(out, mdet)
 		} else {
 			mdet = al.PolynomialScale(mdet, -1)
-			if this.height == 4 {
-				autopsy.Store(m.ToString() + " * " + det.ToString() + " = " + mdet.ToString())
+			if this.height < 5 {
+				//autopsy.Store("-" + m.ToString() + " * " + det.ToString() + " = " + mdet.ToString())
 			}
 			out = al.PolynomialAdd(out, mdet)
 		}
 	}
+	//autopsy.Store(fmt.Sprintf("returning %s", out.ToString()))
 	return out
 }

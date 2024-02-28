@@ -2,6 +2,7 @@ package algebra
 
 import (
 	fr "matrix/fractions"
+	"matrix/utils"
 )
 
 type polycule struct {
@@ -41,13 +42,14 @@ func slice_contains(data []int, value int) bool {
 	return false
 }
 func (this *Polynomial) compress() {
+	utils.SortInplace[polycule](this.data, polycule_cmp)
 	if len(this.data) < 2 {
 		return
 	}
 	new_data := make([]polycule, 0)
 	powers := make([]int, 0)
 	for i := 0; i < len(this.data); i++ {
-		if !slice_contains(powers, this.data[i].pow) {
+		if !slice_contains(powers, this.data[i].pow) && !fr.Equals(this.data[i].coef, fr.FromFloat(0)) {
 			powers = append(powers, this.data[i].pow)
 		}
 	}

@@ -3,10 +3,7 @@ package main
 import (
 	"fmt"
 	"math/rand"
-	autopsy "matrix/Autopsy"
-	La "matrix/La"
-	fr "matrix/fractions"
-	"os"
+	algebra "matrix/Algebra"
 )
 
 func make_ints(amnt int) []int {
@@ -25,22 +22,11 @@ func print_ints(arr []int) {
 	}
 }
 func main() {
-	//v := LA.MatrixFromInts([][]int{{1, 1, 4}, {7, 9, 3}, {6, 4, 6}})
-	//v := LA.RandomMatrix(3, 3)
-	autopsy.Init()
-	for i := 0; i < 100000; i++ {
-		v := La.RandomMatrix(4, 4)
-		v1 := v.Determinant()
-		u := v.ToPolyMatrix()
-		t := u.CharacteristicPolynomial()
-		if !fr.Equals(t.ZeroCoef(), v1) {
-			println("failed\n")
-			println(v.ToString())
-			println(t.ToString())
-			println(v1.ToString())
-			os.Exit(1)
-		}
-	}
-	println("success")
+	a := algebra.PolynomialFromString("2+3x^2")
+	println(a.ToString())
+	b := algebra.PolynomialFromString("2-3x^2")
+	println(b.ToString())
+	c := algebra.PolynomialMult(a, b)
+	println(c.ToString())
 	return
 }

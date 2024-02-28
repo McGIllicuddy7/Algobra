@@ -116,3 +116,13 @@ func NewPoly(coef fr.Fraction, pow int) Polynomial {
 func CompPoly(coef fr.Fraction, ceof2 fr.Fraction, pow int) Polynomial {
 	return Polynomial{[]polycule{{coef, 0}, {ceof2, pow}}}
 }
+func (this *polycule) Evaluate(x fr.Fraction) fr.Fraction {
+	return fr.Mult(this.coef, fr.Pow(x, this.pow))
+}
+func (this Polynomial) Evaluate(x fr.Fraction) fr.Fraction {
+	out := fr.FromInt(0)
+	for i := 0; i < len(this.data); i++ {
+		fr.Add(out, this.data[i].Evaluate(x))
+	}
+	return out
+}

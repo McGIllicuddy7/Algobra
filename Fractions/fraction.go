@@ -88,3 +88,16 @@ func FromFloat(v float64) Fraction {
 func FromInt(v int) Fraction {
 	return NewFrac(v, 1)
 }
+func Pow(frac Fraction, power int) Fraction {
+	out := FromInt(1)
+	pow := power
+	frc := frac
+	if pow < 0 {
+		frc = Recip(frc)
+		pow *= -1
+	}
+	for i := 0; i < power; i++ {
+		out = Mult(out, frc)
+	}
+	return out
+}

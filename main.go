@@ -27,7 +27,7 @@ func print_ints(arr []int) {
 func main() {
 	//v := LA.MatrixFromInts([][]int{{1, 1, 4}, {7, 9, 3}, {6, 4, 6}})
 	//v := LA.RandomMatrix(3, 3)
-	for i := 0; i < 10000; i++ {
+	for i := 0; i < 1000000; i++ {
 		v := LA.RandomMatrix(3, 3)
 		v1 := v.Determinant()
 		tmp := v.ToPolyMatrix().CharacteristicPolynomial()

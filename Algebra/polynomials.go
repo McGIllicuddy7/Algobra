@@ -124,7 +124,8 @@ func (this *polycule) Evaluate(x fr.Fraction) fr.Fraction {
 func (this Polynomial) Evaluate(x fr.Fraction) fr.Fraction {
 	out := fr.FromInt(0)
 	for i := 0; i < len(this.data); i++ {
-		fr.Add(out, this.data[i].Evaluate(x))
+		addr := this.data[i].Evaluate(x)
+		out = fr.Add(out, addr)
 	}
 	return out
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	algebra "matrix/Algebra"
+	fractions "matrix/fractions"
 )
 
 func make_ints(amnt int) []int {
@@ -22,11 +23,12 @@ func print_ints(arr []int) {
 	}
 }
 func main() {
-	a := algebra.PolynomialFromString("2+3x^2")
+	a := algebra.PolynomialFromString("2+3x")
 	println(a.ToString())
-	b := algebra.PolynomialFromString("2-3x^2")
+	b := algebra.PolynomialFromString("2-3x")
 	println(b.ToString())
 	c := algebra.PolynomialMult(a, b)
 	println(c.ToString())
+	println(c.Evaluate(fractions.FromFloat(1.2)).ToString())
 	return
 }

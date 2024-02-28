@@ -97,7 +97,6 @@ func (this PolyMatrix) CharacteristicPolynomial() al.Polynomial {
 		ad := al.PolynomialMult(a, d)
 		bc := al.PolynomialMult(b, c)
 		ret := al.PolynomialSub(ad, bc)
-		///autopsy.Store(fmt.Sprintf("returning:%s", ret.ToString()))
 		return ret
 	}
 	var out al.Polynomial
@@ -105,22 +104,13 @@ func (this PolyMatrix) CharacteristicPolynomial() al.Polynomial {
 		tmp := this.elimRowCollumn(i)
 		m := this.Get(i, 0)
 		det := tmp.CharacteristicPolynomial()
-
-		//autopsy.Store(fmt.Sprintf("guass det: %f, recurse det:%f", real(matdet), real(dt)))
 		mdet := al.PolynomialMult(m, det)
 		if i%2 == 0 {
-			if this.height < 5 {
-				//autopsy.Store(m.ToString() + " * " + det.ToString() + " = " + mdet.ToString())
-			}
 			out = al.PolynomialAdd(out, mdet)
 		} else {
 			mdet = al.PolynomialScale(mdet, -1)
-			if this.height < 5 {
-				//autopsy.Store("-" + m.ToString() + " * " + det.ToString() + " = " + mdet.ToString())
-			}
 			out = al.PolynomialAdd(out, mdet)
 		}
 	}
-	//autopsy.Store(fmt.Sprintf("returning %s", out.ToString()))
 	return out
 }

@@ -4,7 +4,6 @@ import (
 	"cmp"
 	"fmt"
 	"math"
-	"strconv"
 )
 
 func partition[T any](slice []T, cmp_func func(T, T) int, start int, end int) int {
@@ -62,23 +61,23 @@ func TrivIsSorted[T cmp.Ordered](slice []T) bool {
 	}
 	return true
 }
-func formatFloat64(f float64) string {
+func FormatFloat64(f float64) string {
 	if math.Floor(f) == f {
 		return fmt.Sprintf("%d", int(f))
 	} else {
-		return strconv.FormatFloat(f, 'g', 4, 64)
+		return fmt.Sprintf("%f", f)
 	}
 }
 func FormatComplex(c complex128) string {
 	out := ""
 	if real(c) != 0 {
-		out += formatFloat64(real(c))
+		out += FormatFloat64(real(c))
 		if imag(c) != 0 {
 			out += "+"
 		}
 	}
 	if imag(c) != 0 {
-		out += formatFloat64(imag(c))
+		out += FormatFloat64(imag(c))
 		out += "i"
 	} else {
 		if real(c) == 0 {

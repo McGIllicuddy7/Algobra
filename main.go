@@ -5,6 +5,7 @@ import (
 	"math"
 	"math/rand"
 	"matrix/LA"
+	"matrix/utils"
 	"os"
 	"strconv"
 )
@@ -28,7 +29,7 @@ func main() {
 	//v := LA.MatrixFromInts([][]int{{1, 1, 4}, {7, 9, 3}, {6, 4, 6}})
 	//v := LA.RandomMatrix(3, 3)
 	for i := 0; i < 1000000; i++ {
-		v := LA.RandomMatrix(3, 3)
+		v := LA.RandomMatrix(4, 4)
 		v1 := v.Determinant()
 		tmp := v.ToPolyMatrix().CharacteristicPolynomial()
 		v2, err := strconv.ParseComplex(tmp.ToString(), 128)
@@ -36,9 +37,9 @@ func main() {
 			println("failed\n")
 			os.Exit(1)
 		}
-		if math.Round(real(v2)) != math.Round(real(v1)) {
-			println(v1, "!=", v2)
-			println("failed\n")
+		if math.Round(real(v1)) != math.Round(real(v2)) {
+			fmt.Printf("\nfailed at i = %d \n matrix:\n%s", i, v.ToString())
+			println(utils.FormatComplex(v1), "!=", utils.FormatComplex(v2))
 			os.Exit(1)
 		}
 		if i%1000 == 0 {

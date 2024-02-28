@@ -66,7 +66,7 @@ func formatFloat64(f float64) string {
 	if math.Floor(f) == f {
 		return fmt.Sprintf("%d", int(f))
 	} else {
-		return strconv.FormatFloat(f, 'g', 2, 64)
+		return strconv.FormatFloat(f, 'g', 4, 64)
 	}
 }
 func FormatComplex(c complex128) string {

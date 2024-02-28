@@ -86,7 +86,7 @@ func PolynomialMult(a Polynomial, b Polynomial) Polynomial {
 func PolynomialScale(a Polynomial, s complex128) Polynomial {
 	out := a.Clone()
 	for i := 0; i < len(a.data); i++ {
-		out.data[i].coef *= s
+		out.data[i].coef = a.data[i].coef * s
 	}
 	return out
 }
@@ -150,8 +150,4 @@ func CompPoly(addval complex128, coef complex128, pow int) Polynomial {
 	out.addPolycule(v2)
 	out.compress()
 	return out
-}
-func (this *Polynomial) Add(p Polynomial) {
-	this.data = append(this.data, p.data...)
-	this.compress()
 }

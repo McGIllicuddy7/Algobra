@@ -301,7 +301,7 @@ func RandomMatrix(height int, width int) Matrix {
 	out.width = width
 	for y := 0; y < height; y++ {
 		for x := 0; x < width; x++ {
-			out.Set(x, y, complex(float64(rand.Int31()%100), 0))
+			out.Set(x, y, complex(float64(rand.Int31()%10+1), 0))
 		}
 	}
 	return out

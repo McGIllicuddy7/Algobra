@@ -129,3 +129,6 @@ func (this Polynomial) Evaluate(x fr.Fraction) fr.Fraction {
 	}
 	return out
 }
+func (this Polynomial) FindZeros() []fr.Fraction {
+	return make([]fr.Fraction, 0)
+}

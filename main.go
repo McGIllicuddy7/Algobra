@@ -3,8 +3,7 @@ package main
 import (
 	"fmt"
 	"math/rand"
-	algebra "matrix/Algebra"
-	fractions "matrix/fractions"
+	La "matrix/LA"
 )
 
 func make_ints(amnt int) []int {
@@ -23,12 +22,11 @@ func print_ints(arr []int) {
 	}
 }
 func main() {
-	a := algebra.PolynomialFromString("2+3x")
-	println(a.ToString())
-	b := algebra.PolynomialFromString("2-3x")
-	println(b.ToString())
-	c := algebra.PolynomialMult(a, b)
-	println(c.ToString())
-	println(c.Evaluate(fractions.FromFloat(1.2)).ToString())
+	for i := 1; i < 5; i++ {
+		mat := La.RandomMatrix(i, i)
+		//println(i)
+		poly := mat.Determinant()
+		println(poly.ToString())
+	}
 	return
 }

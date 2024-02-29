@@ -108,7 +108,7 @@ func NormalizeStrlens(in []string) []string {
 	return out
 }
 func RandomComplex() complex128 {
-	const max = 10000
+	const max = 10000000
 	return complex(float64(rand.Int63()%(max*2)-max), float64(rand.Int63()%(max*2)-max))
 }
 func Contains[T comparable](slice []T, value T) bool {

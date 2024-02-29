@@ -207,15 +207,10 @@ func (this Polynomial) FindZero(seed complex128) complex128 {
 	value := seed
 	failsafe := 0
 restart:
-	for i := 0; i < 10000; i++ {
+	for i := 0; i < 1000; i++ {
 		current := this.EvaluateComplex(value)
 		delta := der.EvaluateComplex(value)
 		value -= current / delta
-		if i%1000 == 0 {
-			//cstr := utils.FormatComplex(current)
-			//vstr := utils.FormatComplex(value)
-			//fmt.Printf("current:%s value: %s\n", cstr, vstr)
-		}
 	}
 	if failsafe < 10 {
 		failsafe++

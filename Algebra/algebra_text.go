@@ -9,6 +9,9 @@ import (
 func (this *Polynomial) ToString() string {
 	out := ""
 	for i := 0; i < len(this.data); i++ {
+		if fr.Equals(this.data[i].coef, fr.FromInt(0)) {
+			continue
+		}
 		if !fr.Equals(this.data[i].coef, fr.FromInt(1)) {
 			out += this.data[i].coef.ToString()
 		}

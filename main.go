@@ -1,32 +1,51 @@
 package main
 
 import (
-	"fmt"
-	"math/rand"
-	La "matrix/LA"
+	autopsy "matrix/Autopsy"
+	al "matrix/algebra"
+	"matrix/utils"
 )
 
-func make_ints(amnt int) []int {
-	out := make([]int, amnt)
-	for i := 0; i < amnt; i++ {
-		out[i] = int(rand.Int31()) % (amnt * 2)
+const count = 1000000
+
+/*
+	func polynomial(x complex128) complex128 {
+		return 2*x*x - 4*x + 5
 	}
-	return out
-}
-func print_ints(arr []int) {
-	for i := 0; i < len(arr); i++ {
-		fmt.Printf("%d", arr[i])
-		if i != len(arr)-1 {
-			print(",")
+
+	func evaluateCompiled() float64 {
+		t := time.Now()
+		for i := 0; i < count; i++ {
+			r := polynomial(utils.RandomComplex())
+			if rand.Int31()%count*10 == 0 {
+				autopsy.Store(utils.FormatComplex(r))
+			}
 		}
+		out := time.Now().Sub(t).Seconds()
+		return out
 	}
-}
+
+	func evaluateParsed(poly al.Polynomial) float64 {
+		t := time.Now()
+		for i := 0; i < count; i++ {
+			r := poly.EvaluateComplex(utils.RandomComplex())
+			if rand.Int31()%count*10 == 0 {
+				autopsy.Store(utils.FormatComplex(r))
+			}
+		}
+		out := time.Now().Sub(t).Seconds()
+		return out
+	}
+*/
 func main() {
-	for i := 1; i < 5; i++ {
-		mat := La.RandomMatrix(i, i)
-		//println(i)
-		poly := mat.Determinant()
-		println(poly.ToString())
+	autopsy.Init()
+	poly := al.PolynomialFromString("7x^5-2x^4+x-3")
+	println(poly.ToString())
+	roots := poly.FindZeros()
+	for i := 0; i < len(roots); i++ {
+		println("root:", utils.FormatComplex(roots[i]))
+		println("value:", utils.FormatComplex(poly.EvaluateComplex(roots[i])))
+		println()
 	}
 	return
 }

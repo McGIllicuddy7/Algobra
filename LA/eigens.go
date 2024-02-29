@@ -1,7 +1,7 @@
 package La
 
 import (
-	al "matrix/Algebra"
+	al "matrix/algebra"
 	fr "matrix/fractions"
 	"matrix/utils"
 )

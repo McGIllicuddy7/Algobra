@@ -4,6 +4,8 @@ import (
 	"cmp"
 	"fmt"
 	"math"
+	"math/cmplx"
+	"math/rand"
 )
 
 func partition[T any](slice []T, cmp_func func(T, T) int, start int, end int) int {
@@ -104,4 +106,20 @@ func NormalizeStrlens(in []string) []string {
 		out[i] = normalize_strlen(in[i], max)
 	}
 	return out
+}
+func RandomComplex() complex128 {
+	const max = 10000
+	return complex(float64(rand.Int63()%(max*2)-max), float64(rand.Int63()%(max*2)-max))
+}
+func Contains[T comparable](slice []T, value T) bool {
+	for i := 0; i < len(slice); i++ {
+		if slice[i] == value {
+			return true
+		}
+	}
+	return false
+}
+func ComplexNearlyEqual(v0 complex128, v1 complex128) bool {
+	v := v0 - v1
+	return cmplx.Abs(v) < 0.1
 }

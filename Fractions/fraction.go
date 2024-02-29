@@ -6,18 +6,16 @@ import (
 )
 
 type Fraction struct {
-	num int
-	den int
+	num int64
+	den int64
 }
 
 func NewFrac(num int, denum int) Fraction {
-	out := Fraction{num, denum}
-	out.den = denum
-	out.num = num
+	out := Fraction{int64(num), int64(denum)}
 	out.simplify()
 	return out
 }
-func gcf(a int, b int) int {
+func gcf(a int64, b int64) int64 {
 	if b == 0 {
 		return a
 	}
@@ -47,12 +45,23 @@ func Mult(f0 Fraction, f1 Fraction) Fraction {
 	out.simplify()
 	return out
 }
+func Divide(f0 Fraction, f1 Fraction) Fraction {
+	f2 := Recip(f1)
+	out := Fraction{(f0.num * f2.num), (f0.den * f2.den)}
+	out.simplify()
+	return out
+}
+func Sqrt(f0 Fraction) Fraction {
+	num := FromFloat(math.Sqrt(float64(f0.num)))
+	den := FromFloat(math.Sqrt(float64(f0.num)))
+	return Mult(num, Recip(den))
+}
 func Add(f0 Fraction, f1 Fraction) Fraction {
 	out := Fraction{(f0.num*f1.den + f1.num*f0.den), (f0.den * f1.den)}
 	out.simplify()
 	return out
 }
-func Scale(f0 Fraction, scalar int) Fraction {
+func Scale(f0 Fraction, scalar int64) Fraction {
 	out := Fraction{(f0.num * scalar), (f0.den)}
 	out.simplify()
 	return out
@@ -65,6 +74,9 @@ func Recip(f0 Fraction) Fraction {
 	return Fraction{f0.den, f0.num}
 }
 func Equals(f0 Fraction, f1 Fraction) bool {
+	if f0.num == 0 && f1.num == 0 {
+		return true
+	}
 	return f0.num == f1.num && f1.den == f0.den
 }
 func (this Fraction) ToFloat() float64 {
@@ -73,7 +85,7 @@ func (this Fraction) ToFloat() float64 {
 func (this Fraction) ToComplex() complex128 {
 	return complex(this.ToFloat(), 0)
 }
-func (this Fraction) ToInt() int {
+func (this Fraction) ToInt() int64 {
 	return this.num / this.den
 }
 func FromFloat(v float64) Fraction {

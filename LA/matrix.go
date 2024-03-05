@@ -11,31 +11,29 @@ type Matrix struct {
 	width  int
 }
 
-func (this *Matrix) Get(x int, y int) fr.Fraction {
-	return this.data[y*this.width+x]
+func (tmat *Matrix) Get(x int, y int) fr.Fraction {
+	return tmat.data[y*tmat.width+x]
 }
-func (this *Matrix) Set(x int, y int, v fr.Fraction) {
-	this.data[y*this.width+x] = v
+func (tmat *Matrix) Set(x int, y int, v fr.Fraction) {
+	tmat.data[y*tmat.width+x] = v
 }
-func (this *Matrix) NumCols() int {
-	return this.width
+func (tmat *Matrix) NumCols() int {
+	return tmat.width
 }
-func (this *Matrix) NumRows() int {
-	return this.height
+func (tmat *Matrix) NumRows() int {
+	return tmat.height
 }
-func (this *Matrix) Clone() Matrix {
-	out := Matrix{make([]fr.Fraction, len(this.data)), this.height, this.width}
-	for i := 0; i < len(this.data); i++ {
-		out.data[i] = this.data[i]
-	}
+func (tmat *Matrix) Clone() Matrix {
+	out := Matrix{make([]fr.Fraction, len(tmat.data)), tmat.height, tmat.width}
+	copy(out.data, tmat.data)
 	return out
 }
-func (this *Matrix) ToString() string {
+func (tmat *Matrix) ToString() string {
 	out := ""
-	out_strs := make([]string, 0, this.height*this.width)
-	for j := 0; j < this.height; j++ {
-		for i := 0; i < this.width; i++ {
-			out_strs = append(out_strs, this.Get(i, j).ToString())
+	out_strs := make([]string, 0, tmat.height*tmat.width)
+	for j := 0; j < tmat.height; j++ {
+		for i := 0; i < tmat.width; i++ {
+			out_strs = append(out_strs, tmat.Get(i, j).ToString())
 		}
 	}
 	max := 0
@@ -52,10 +50,10 @@ func (this *Matrix) ToString() string {
 			out_strs[i] += " "
 		}
 	}
-	for j := 0; j < this.height; j++ {
-		for i := 0; i < this.width; i++ {
-			out += out_strs[j*this.width+i]
-			if i < this.width-1 {
+	for j := 0; j < tmat.height; j++ {
+		for i := 0; i < tmat.width; i++ {
+			out += out_strs[j*tmat.width+i]
+			if i < tmat.width-1 {
 				out += " "
 			}
 		}
@@ -63,34 +61,34 @@ func (this *Matrix) ToString() string {
 	}
 	return out
 }
-func (this *Matrix) SwapRows(r0 int, r1 int) {
-	for i := 0; i < this.width; i++ {
-		tmp0 := this.Get(i, r0)
-		tmp1 := this.Get(i, r1)
-		this.Set(i, r1, tmp0)
-		this.Set(i, r0, tmp1)
+func (tmat *Matrix) SwapRows(r0 int, r1 int) {
+	for i := 0; i < tmat.width; i++ {
+		tmp0 := tmat.Get(i, r0)
+		tmp1 := tmat.Get(i, r1)
+		tmat.Set(i, r1, tmp0)
+		tmat.Set(i, r0, tmp1)
 	}
 }
 
 // adds r0 to r1 scaled by s
-func (this *Matrix) AddRows(r0 int, r1 int, s fr.Fraction) {
-	for i := 0; i < this.width; i++ {
-		tmp0 := fr.Mult(this.Get(i, r0), s)
-		this.Set(i, r1, fr.Add(tmp0, this.Get(i, r1)))
+func (tmat *Matrix) AddRows(r0 int, r1 int, s fr.Fraction) {
+	for i := 0; i < tmat.width; i++ {
+		tmp0 := fr.Mult(tmat.Get(i, r0), s)
+		tmat.Set(i, r1, fr.Add(tmp0, tmat.Get(i, r1)))
 	}
 }
 
 // subtracts r0 from r1
-func (this *Matrix) SubRows(r0 int, r1 int, s fr.Fraction) {
-	for i := 0; i < this.width; i++ {
-		tmp0 := fr.Mult(this.Get(i, r0), s)
-		this.Set(i, r1, fr.Sub(this.Get(i, r1), tmp0))
+func (tmat *Matrix) SubRows(r0 int, r1 int, s fr.Fraction) {
+	for i := 0; i < tmat.width; i++ {
+		tmp0 := fr.Mult(tmat.Get(i, r0), s)
+		tmat.Set(i, r1, fr.Sub(tmat.Get(i, r1), tmp0))
 	}
 }
-func (this *Matrix) ScaleRow(r0 int, s fr.Fraction) {
-	for i := 0; i < this.width; i++ {
-		tmp0 := fr.Mult(this.Get(i, r0), s)
-		this.Set(i, r0, tmp0)
+func (tmat *Matrix) ScaleRow(r0 int, s fr.Fraction) {
+	for i := 0; i < tmat.width; i++ {
+		tmp0 := fr.Mult(tmat.Get(i, r0), s)
+		tmat.Set(i, r0, tmp0)
 	}
 }
 func Identity(n int) Matrix {
@@ -206,12 +204,10 @@ func MatrixPairRowReduce(source Matrix, target Matrix) (Matrix, Matrix) {
 	}
 	return mtrx, out
 }
-func (this *Matrix) Determinant() fr.Fraction {
-	mtrx := Matrix{make([]fr.Fraction, len(this.data)), this.height, this.width}
+func (tmat *Matrix) Determinant() fr.Fraction {
+	mtrx := Matrix{make([]fr.Fraction, len(tmat.data)), tmat.height, tmat.width}
 	out := fr.FromInt(1)
-	for i := 0; i < len(this.data); i++ {
-		mtrx.data[i] = this.data[i]
-	}
+	copy(mtrx.data, tmat.data)
 	for i := 0; i < mtrx.width; i++ {
 		r := i
 		degen := false
@@ -245,8 +241,8 @@ func (this *Matrix) Determinant() fr.Fraction {
 	}
 	return out
 }
-func (this *Matrix) Inverse() Matrix {
-	_, out := MatrixPairRowReduce(*this, Identity(this.width))
+func (tmat *Matrix) Inverse() Matrix {
+	_, out := MatrixPairRowReduce(*tmat, Identity(tmat.width))
 	return out
 }
 func RandomMatrix(height int, width int) Matrix {
@@ -261,8 +257,8 @@ func RandomMatrix(height int, width int) Matrix {
 	}
 	return out
 }
-func (this *Matrix) ToUpperTriangular() Matrix {
-	mtrx := this.Clone()
+func (tmat *Matrix) ToUpperTriangular() Matrix {
+	mtrx := tmat.Clone()
 	for i := 0; i < mtrx.width; i++ {
 		r := i
 		degen := false
@@ -291,8 +287,8 @@ func (this *Matrix) ToUpperTriangular() Matrix {
 	}
 	return mtrx
 }
-func (this *Matrix) Solve(values Vector) Vector {
-	mtrx := this.Clone()
+func (tmat *Matrix) Solve(values Vector) Vector {
+	mtrx := tmat.Clone()
 	vals := values.Clone()
 	for i := 0; i < mtrx.width; i++ {
 		r := i
@@ -324,15 +320,15 @@ func (this *Matrix) Solve(values Vector) Vector {
 			vals[j] -= vals[i] * mlt.ToComplex()
 		}
 	}
-	symbolTable := make(Vector, this.width)
-	definedSymbols := make([]bool, this.width)
+	symbolTable := make(Vector, tmat.width)
+	definedSymbols := make([]bool, tmat.width)
 	for i := 0; i < len(symbolTable); i++ {
 		symbolTable[i] = 0
 		definedSymbols[i] = false
 	}
-	for y := this.height - 1; y >= 0; y-- {
+	for y := tmat.height - 1; y >= 0; y-- {
 		syms := make([]int, 0)
-		for x := 0; x < this.width; x++ {
+		for x := 0; x < tmat.width; x++ {
 			if !(fr.Equals(mtrx.Get(x, y), fr.FromInt(0))) {
 				syms = append(syms, x)
 			}
@@ -352,7 +348,7 @@ func (this *Matrix) Solve(values Vector) Vector {
 			//println(undefined[0])
 			newSym := complex128(0)
 			for i := 1; i < len(syms); i++ {
-				newSym -= symbolTable[syms[i]] * this.Get(syms[i], y).ToComplex()
+				newSym -= symbolTable[syms[i]] * tmat.Get(syms[i], y).ToComplex()
 			}
 			newSym += vals[y]
 			newSym /= mtrx.Get(undefined[0], y).ToComplex()
@@ -362,12 +358,12 @@ func (this *Matrix) Solve(values Vector) Vector {
 	}
 	return symbolTable
 }
-func (this *Matrix) MultByVector(v Vector) Vector {
+func (tmat *Matrix) MultByVector(v Vector) Vector {
 	out := make(Vector, len(v))
-	for i := 0; i < this.height; i++ {
+	for i := 0; i < tmat.height; i++ {
 		total := complex128(0)
-		for j := 0; j < this.width; j++ {
-			total += this.Get(j, i).ToComplex() * v[j]
+		for j := 0; j < tmat.width; j++ {
+			total += tmat.Get(j, i).ToComplex() * v[j]
 		}
 		out[i] = total
 	}

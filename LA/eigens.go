@@ -12,23 +12,23 @@ type PolyMatrix struct {
 	width  int
 }
 
-func (this *PolyMatrix) Get(x int, y int) al.Polynomial {
-	return this.data[y*this.width+x]
+func (tmat *PolyMatrix) Get(x int, y int) al.Polynomial {
+	return tmat.data[y*tmat.width+x]
 }
-func (this *PolyMatrix) Set(x int, y int, v al.Polynomial) {
-	this.data[y*this.height+x] = v
+func (tmat *PolyMatrix) Set(x int, y int, v al.Polynomial) {
+	tmat.data[y*tmat.height+x] = v
 }
-func (this *PolyMatrix) ToString() string {
-	strings := make([]string, this.height*this.width)
-	for i := 0; i < len(this.data); i++ {
-		strings[i] = this.data[i].ToString()
+func (tmat *PolyMatrix) ToString() string {
+	strings := make([]string, tmat.height*tmat.width)
+	for i := 0; i < len(tmat.data); i++ {
+		strings[i] = tmat.data[i].ToString()
 	}
 	strings = utils.NormalizeStrlens(strings)
 	out := ""
-	for y := 0; y < this.height; y++ {
-		for x := 0; x < this.width; x++ {
-			out += strings[y*this.height+x]
-			if x < this.width-1 {
+	for y := 0; y < tmat.height; y++ {
+		for x := 0; x < tmat.width; x++ {
+			out += strings[y*tmat.height+x]
+			if x < tmat.width-1 {
 				out += " "
 			}
 		}
@@ -36,46 +36,46 @@ func (this *PolyMatrix) ToString() string {
 	}
 	return out
 }
-func (this *Matrix) ToEigenMatrix() PolyMatrix {
-	out := PolyMatrix{make([]al.Polynomial, this.height*this.width), this.height, this.width}
-	for y := 0; y < this.height; y++ {
-		for x := 0; x < this.width; x++ {
+func (tmat *Matrix) ToEigenMatrix() PolyMatrix {
+	out := PolyMatrix{make([]al.Polynomial, tmat.height*tmat.width), tmat.height, tmat.width}
+	for y := 0; y < tmat.height; y++ {
+		for x := 0; x < tmat.width; x++ {
 			var v al.Polynomial
 			if x == y {
-				v = al.CompPoly(this.Get(x, y), fr.NewFrac(-1, 1), 1)
+				v = al.CompPoly(tmat.Get(x, y), fr.NewFrac(-1, 1), 1)
 			} else {
-				v = al.CompPoly(this.Get(x, y), fr.NewFrac(0, 1), 0)
+				v = al.CompPoly(tmat.Get(x, y), fr.NewFrac(0, 1), 0)
 			}
 			out.Set(x, y, v)
 		}
 	}
 	return out
 }
-func (this *Matrix) ToPolyMatrix() PolyMatrix {
-	out := PolyMatrix{make([]al.Polynomial, this.height*this.width), this.height, this.width}
-	for y := 0; y < this.height; y++ {
-		for x := 0; x < this.width; x++ {
-			v := al.CompPoly(this.Get(x, y), fr.NewFrac(0, 1), 0)
+func (tmat *Matrix) ToPolyMatrix() PolyMatrix {
+	out := PolyMatrix{make([]al.Polynomial, tmat.height*tmat.width), tmat.height, tmat.width}
+	for y := 0; y < tmat.height; y++ {
+		for x := 0; x < tmat.width; x++ {
+			v := al.CompPoly(tmat.Get(x, y), fr.NewFrac(0, 1), 0)
 			out.Set(x, y, v)
 		}
 	}
 	return out
 }
-func (this *PolyMatrix) ToMatrix() Matrix {
-	out := Matrix{make([]fr.Fraction, this.height*this.width), this.height, this.width}
-	for y := 0; y < this.height; y++ {
-		for x := 0; x < this.width; x++ {
-			v := this.Get(x, y).ZeroCoef()
+func (tmat *PolyMatrix) ToMatrix() Matrix {
+	out := Matrix{make([]fr.Fraction, tmat.height*tmat.width), tmat.height, tmat.width}
+	for y := 0; y < tmat.height; y++ {
+		for x := 0; x < tmat.width; x++ {
+			v := tmat.Get(x, y).ZeroCoef()
 			out.Set(x, y, v)
 		}
 	}
 	return out
 }
-func (this *PolyMatrix) elimRowCollumn(idx int) PolyMatrix {
-	out := PolyMatrix{make([]al.Polynomial, (this.width-1)*(this.height-1)), this.height - 1, this.width - 1}
-	for y := 1; y < this.height; y++ {
+func (tmat *PolyMatrix) elimRowCollumn(idx int) PolyMatrix {
+	out := PolyMatrix{make([]al.Polynomial, (tmat.width-1)*(tmat.height-1)), tmat.height - 1, tmat.width - 1}
+	for y := 1; y < tmat.height; y++ {
 		dy := y - 1
-		for x := 0; x < this.width; x++ {
+		for x := 0; x < tmat.width; x++ {
 			dx := x
 			if dx == idx {
 				continue
@@ -83,27 +83,27 @@ func (this *PolyMatrix) elimRowCollumn(idx int) PolyMatrix {
 			if x > idx {
 				dx--
 			}
-			out.Set(dx, dy, this.Get(x, y))
+			out.Set(dx, dy, tmat.Get(x, y))
 		}
 	}
 	return out
 }
 
-func (this PolyMatrix) CharacteristicPolynomial() al.Polynomial {
-	if this.width == 2 && this.height == 2 {
-		a := this.Get(0, 0)
-		b := this.Get(0, 1)
-		c := this.Get(1, 0)
-		d := this.Get(1, 1)
+func (tmat PolyMatrix) CharacteristicPolynomial() al.Polynomial {
+	if tmat.width == 2 && tmat.height == 2 {
+		a := tmat.Get(0, 0)
+		b := tmat.Get(0, 1)
+		c := tmat.Get(1, 0)
+		d := tmat.Get(1, 1)
 		ad := al.PolynomialMult(a, d)
 		bc := al.PolynomialMult(b, c)
 		ret := al.PolynomialSub(ad, bc)
 		return ret
 	}
 	var out al.Polynomial
-	for i := 0; i < this.width; i++ {
-		tmp := this.elimRowCollumn(i)
-		m := this.Get(i, 0)
+	for i := 0; i < tmat.width; i++ {
+		tmp := tmat.elimRowCollumn(i)
+		m := tmat.Get(i, 0)
 		det := tmp.CharacteristicPolynomial()
 		mdet := al.PolynomialMult(m, det)
 		if i%2 == 0 {
@@ -115,18 +115,18 @@ func (this PolyMatrix) CharacteristicPolynomial() al.Polynomial {
 	}
 	return out
 }
-func (this *Matrix) EigenValues() []complex128 {
-	eigen := this.ToEigenMatrix()
+func (tmat *Matrix) EigenValues() []complex128 {
+	eigen := tmat.ToEigenMatrix()
 	poly := eigen.CharacteristicPolynomial()
 	return poly.FindZeros()
 }
-func (this *Matrix) EigenVectors() []Vector {
-	eigens := this.EigenValues()
+func (tmat *Matrix) EigenVectors() []Vector {
+	eigens := tmat.EigenValues()
 	out := make([]Vector, 0)
 	for i := 0; i < len(eigens); i++ {
-		mat := MatrixSub(*this, MatrixScale(Identity(this.height), fr.FromFloat(real(eigens[i]))))
-		tmp := mat.Solve(ZeroVector(this.height))
-		if !VectorEqual(mat.MultByVector(tmp), ZeroVector(this.height)) {
+		mat := MatrixSub(*tmat, MatrixScale(Identity(tmat.height), fr.FromFloat(real(eigens[i]))))
+		tmp := mat.Solve(ZeroVector(tmat.height))
+		if !VectorEqual(mat.MultByVector(tmp), ZeroVector(tmat.height)) {
 			println("failed")
 		}
 		out = append(out, tmp)

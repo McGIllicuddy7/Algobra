@@ -21,18 +21,18 @@ func gcf(a int64, b int64) int64 {
 	}
 	return gcf(b, a%b)
 }
-func (this *Fraction) simplify() {
-	if this.num == 0 {
-		this.den = 1
+func (frac *Fraction) simplify() {
+	if frac.num == 0 {
+		frac.den = 1
 		return
 	}
-	if this.den < 0 {
-		this.num *= -1
-		this.den *= -1
+	if frac.den < 0 {
+		frac.num *= -1
+		frac.den *= -1
 	}
-	gc := gcf(this.num, this.den)
-	this.num /= gc
-	this.den /= gc
+	gc := gcf(frac.num, frac.den)
+	frac.num /= gc
+	frac.den /= gc
 }
 func (f Fraction) ToString() string {
 	if f.den == 1 {
@@ -66,6 +66,8 @@ func Scale(f0 Fraction, scalar int64) Fraction {
 	out.simplify()
 	return out
 }
+
+// subtracts f1 from f0
 func Sub(f0 Fraction, f1 Fraction) Fraction {
 	out := Add(f0, Scale(f1, -1))
 	return out
@@ -79,14 +81,14 @@ func Equals(f0 Fraction, f1 Fraction) bool {
 	}
 	return f0.num == f1.num && f1.den == f0.den
 }
-func (this Fraction) ToFloat() float64 {
-	return float64(this.num) / float64(this.den)
+func (frac Fraction) ToFloat() float64 {
+	return float64(frac.num) / float64(frac.den)
 }
-func (this Fraction) ToComplex() complex128 {
-	return complex(this.ToFloat(), 0)
+func (frac Fraction) ToComplex() complex128 {
+	return complex(frac.ToFloat(), 0)
 }
-func (this Fraction) ToInt() int64 {
-	return this.num / this.den
+func (frac Fraction) ToInt() int64 {
+	return frac.num / frac.den
 }
 func FromFloat(v float64) Fraction {
 	f := v

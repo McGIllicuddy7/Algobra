@@ -124,7 +124,7 @@ func (tmat *Matrix) EigenVectors() []Vector {
 	eigens := tmat.EigenValues()
 	out := make([]Vector, 0)
 	for i := 0; i < len(eigens); i++ {
-		mat := MatrixSub(*tmat, MatrixScale(Identity(tmat.height), fr.FromFloat(real(eigens[i]))))
+		mat := ComplexMatrixSub(tmat.ToComplex(), ComplexMatrixScale(ComplexIdentity(tmat.height), eigens[i]))
 		tmp := mat.Solve(ZeroVector(tmat.height))
 		if !VectorEqual(mat.MultByVector(tmp), ZeroVector(tmat.height)) {
 			println("failed")

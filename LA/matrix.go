@@ -369,3 +369,10 @@ func (tmat *Matrix) MultByVector(v Vector) Vector {
 	}
 	return out
 }
+func (tmat *Matrix) ToComplex() MatrixComplex {
+	out := MatrixComplex{make([]complex128, tmat.height*tmat.width), tmat.height, tmat.width}
+	for i := 0; i < out.width*out.height; i++ {
+		out.data[i] = tmat.data[i].ToComplex()
+	}
+	return out
+}

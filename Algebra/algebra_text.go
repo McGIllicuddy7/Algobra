@@ -6,23 +6,23 @@ import (
 	"strconv"
 )
 
-func (this *Polynomial) ToString() string {
+func (poly *Polynomial) ToString() string {
 	out := ""
-	for i := 0; i < len(this.data); i++ {
-		if fr.Equals(this.data[i].coef, fr.FromInt(0)) {
+	for i := 0; i < len(poly.data); i++ {
+		if fr.Equals(poly.data[i].coef, fr.FromInt(0)) {
 			continue
 		}
-		if !fr.Equals(this.data[i].coef, fr.FromInt(1)) {
-			out += this.data[i].coef.ToString()
+		if !fr.Equals(poly.data[i].coef, fr.FromInt(1)) {
+			out += poly.data[i].coef.ToString()
 		}
-		if this.data[i].pow != 0 {
+		if poly.data[i].pow != 0 {
 			out += "x"
-			if this.data[i].pow != 1 {
-				out += fmt.Sprintf("^%d", this.data[i].pow)
+			if poly.data[i].pow != 1 {
+				out += fmt.Sprintf("^%d", poly.data[i].pow)
 			}
 		}
-		if i < len(this.data)-1 {
-			if this.data[i+1].coef.ToInt() > 0 {
+		if i < len(poly.data)-1 {
+			if poly.data[i+1].coef.ToInt() > 0 {
 				out += "+"
 			}
 		}
@@ -39,7 +39,7 @@ func parsePolycule(str *string) polycule {
 		minus = true
 		(*str) = (*str)[1:]
 	}
-	for true {
+	for {
 		if (*str)[0] == 'x' {
 			contains_x = true
 			(*str) = (*str)[1:]
@@ -73,7 +73,7 @@ func parsePolycule(str *string) polycule {
 				}
 			}
 		}
-		for true {
+		for {
 			if len(*str) < 1 {
 				break
 			}
@@ -93,7 +93,7 @@ func parsePolycule(str *string) polycule {
 	if len(right) > 0 {
 		v, err := strconv.ParseInt(right, 10, 64)
 		if err != nil {
-
+			panic(err.Error())
 		}
 		rightv = int(v)
 		if right_minus {
@@ -103,7 +103,7 @@ func parsePolycule(str *string) polycule {
 	if len(left) > 0 {
 		v, err := strconv.ParseFloat(left, 64)
 		if err != nil {
-
+			panic(err.Error())
 		}
 		leftv = fr.FromFloat(v)
 		if minus {

@@ -15,9 +15,9 @@ type Polynomial struct {
 	data []polycule
 }
 
-func (this *Polynomial) Clone() Polynomial {
-	out := Polynomial{make([]polycule, len(this.data))}
-	copy(out.data, this.data)
+func (poly *Polynomial) Clone() Polynomial {
+	out := Polynomial{make([]polycule, len(poly.data))}
+	copy(out.data, poly.data)
 	return out
 }
 func polycule_cmp(a polycule, b polycule) int {
@@ -32,9 +32,6 @@ func polycule_cmp(a polycule, b polycule) int {
 func polyculeMlt(a polycule, b polycule) polycule {
 	return polycule{fr.Mult(a.coef, b.coef), a.pow + b.pow}
 }
-func (this *Polynomial) addPolycule(p polycule) {
-	this.data = append(this.data, p)
-}
 func slice_contains(data []int, value int) bool {
 	for i := 0; i < len(data); i++ {
 		if data[i] == value {
@@ -43,29 +40,29 @@ func slice_contains(data []int, value int) bool {
 	}
 	return false
 }
-func (this *Polynomial) compress() {
-	utils.SortInplace[polycule](this.data, polycule_cmp)
+func (poly *Polynomial) compress() {
+	utils.SortInplace[polycule](poly.data, polycule_cmp)
 	new_data := make([]polycule, 0)
 	powers := make([]int, 0)
-	for i := 0; i < len(this.data); i++ {
-		if !slice_contains(powers, this.data[i].pow) && this.data[i].coef.ToInt() != 0 {
-			powers = append(powers, this.data[i].pow)
+	for i := 0; i < len(poly.data); i++ {
+		if !slice_contains(powers, poly.data[i].pow) && poly.data[i].coef.ToInt() != 0 {
+			powers = append(powers, poly.data[i].pow)
 		}
 	}
 	for i := 0; i < len(powers); i++ {
 		p := polycule{fr.NewFrac(0, 1), powers[i]}
-		for j := 0; j < len(this.data); j++ {
-			if this.data[j].pow == powers[i] {
-				p.coef = fr.Add(p.coef, this.data[j].coef)
+		for j := 0; j < len(poly.data); j++ {
+			if poly.data[j].pow == powers[i] {
+				p.coef = fr.Add(p.coef, poly.data[j].coef)
 			}
 		}
 		new_data = append(new_data, p)
 	}
-	this.data = new_data
-	this.data = this.data[:len(powers)]
+	poly.data = new_data
+	poly.data = poly.data[:len(powers)]
 }
-func (this Polynomial) ZeroCoef() fr.Fraction {
-	return this.data[0].coef
+func (poly Polynomial) ZeroCoef() fr.Fraction {
+	return poly.data[0].coef
 }
 func PolynomialAdd(a Polynomial, b Polynomial) Polynomial {
 	var out Polynomial
@@ -118,97 +115,97 @@ func NewPoly(coef fr.Fraction, pow int) Polynomial {
 func CompPoly(coef fr.Fraction, ceof2 fr.Fraction, pow int) Polynomial {
 	return Polynomial{[]polycule{{coef, 0}, {ceof2, pow}}}
 }
-func (this *polycule) evaluate(x fr.Fraction) fr.Fraction {
-	return fr.Mult(this.coef, fr.Pow(x, this.pow))
+func (poly *polycule) evaluate(x fr.Fraction) fr.Fraction {
+	return fr.Mult(poly.coef, fr.Pow(x, poly.pow))
 }
-func (this Polynomial) Evaluate(x fr.Fraction) fr.Fraction {
+func (poly Polynomial) Evaluate(x fr.Fraction) fr.Fraction {
 	out := fr.FromInt(0)
-	for i := 0; i < len(this.data); i++ {
-		addr := this.data[i].evaluate(x)
+	for i := 0; i < len(poly.data); i++ {
+		addr := poly.data[i].evaluate(x)
 		out = fr.Add(out, addr)
 	}
 	return out
 }
-func (this *polycule) evaluateComplex(x complex128) complex128 {
-	v := this.coef.ToComplex()
-	p := complex(float64(this.pow), 0)
+func (poly *polycule) evaluateComplex(x complex128) complex128 {
+	v := poly.coef.ToComplex()
+	p := complex(float64(poly.pow), 0)
 	y := cmplx.Pow(x, p)
 	return v * y
 }
-func (this Polynomial) EvaluateComplex(x complex128) complex128 {
+func (poly Polynomial) EvaluateComplex(x complex128) complex128 {
 	out := complex128(0)
-	for i := 0; i < len(this.data); i++ {
-		out += this.data[i].evaluateComplex(x)
+	for i := 0; i < len(poly.data); i++ {
+		out += poly.data[i].evaluateComplex(x)
 	}
 	return out
 }
-func (this *polycule) Derivitive() {
-	if this.pow == 0 {
-		this.coef = fr.FromInt(0)
-		this.pow = 0
+func (poly *polycule) Derivitive() {
+	if poly.pow == 0 {
+		poly.coef = fr.FromInt(0)
+		poly.pow = 0
 		return
 	}
-	if this.pow == 1 {
-		this.pow = 0
+	if poly.pow == 1 {
+		poly.pow = 0
 		return
 	}
-	this.coef = fr.Scale(this.coef, int64(this.pow))
-	this.pow--
+	poly.coef = fr.Scale(poly.coef, int64(poly.pow))
+	poly.pow--
 }
-func (this *polycule) Integral() error {
-	if this.pow == -1 {
+func (poly *polycule) Integral() error {
+	if poly.pow == -1 {
 		return errors.New("error unspported function \"natural log\"")
 	}
-	this.coef = fr.Scale(this.coef, fr.Recip(fr.FromInt(this.pow+1)).ToInt())
-	this.pow++
+	poly.coef = fr.Scale(poly.coef, fr.Recip(fr.FromInt(poly.pow+1)).ToInt())
+	poly.pow++
 	return nil
 }
-func (this Polynomial) Derivitive() Polynomial {
-	out := this.Clone()
-	for i := 0; i < len(this.data); i++ {
+func (poly Polynomial) Derivitive() Polynomial {
+	out := poly.Clone()
+	for i := 0; i < len(poly.data); i++ {
 		out.data[i].Derivitive()
 	}
-	this.compress()
+	poly.compress()
 	return out
 }
-func (this Polynomial) Integral() (error, Polynomial) {
-	out := this.Clone()
-	for i := 0; i < len(this.data); i++ {
+func (poly Polynomial) Integral() (Polynomial, error) {
+	out := poly.Clone()
+	for i := 0; i < len(poly.data); i++ {
 		err := out.data[i].Integral()
 		if err != nil {
-			return err, NewPoly(fr.FromInt(0), 0)
+			return NewPoly(fr.FromInt(0), 0), err
 		}
 	}
-	return error(nil), out
+	return out, error(nil)
 }
-func (this Polynomial) MinMaxPowers() (int, int) {
-	lowest := this.data[0].pow
-	highest := this.data[0].pow
-	for i := 0; i < len(this.data); i++ {
-		if this.data[i].pow > highest {
-			highest = this.data[i].pow
+func (poly Polynomial) MinMaxPowers() (int, int) {
+	lowest := poly.data[0].pow
+	highest := poly.data[0].pow
+	for i := 0; i < len(poly.data); i++ {
+		if poly.data[i].pow > highest {
+			highest = poly.data[i].pow
 		}
-		if this.data[i].pow < lowest {
-			lowest = this.data[i].pow
+		if poly.data[i].pow < lowest {
+			lowest = poly.data[i].pow
 		}
 	}
 	return lowest, highest
 }
-func (this Polynomial) GetPowerCoefficient(power int) fr.Fraction {
-	for i := 0; i < len(this.data); i++ {
-		if this.data[i].pow == power {
-			return this.data[i].coef
+func (poly Polynomial) GetPowerCoefficient(power int) fr.Fraction {
+	for i := 0; i < len(poly.data); i++ {
+		if poly.data[i].pow == power {
+			return poly.data[i].coef
 		}
 	}
 	return fr.FromInt(0)
 }
-func (this Polynomial) FindZero(seed complex128) complex128 {
-	der := this.Derivitive()
+func (poly Polynomial) FindZero(seed complex128) complex128 {
+	der := poly.Derivitive()
 	value := seed
 	failsafe := 0
 restart:
 	for i := 0; i < 1000; i++ {
-		current := this.EvaluateComplex(value)
+		current := poly.EvaluateComplex(value)
 		delta := der.EvaluateComplex(value)
 		value -= current / delta
 	}
@@ -227,13 +224,13 @@ func cmplxContains(slice []complex128, v complex128) bool {
 	}
 	return false
 }
-func (this Polynomial) FindZeros() []complex128 {
-	minp, maxp := this.MinMaxPowers()
-	utils.SortInplace[polycule](this.data, polycule_cmp)
+func (poly Polynomial) FindZeros() []complex128 {
+	minp, maxp := poly.MinMaxPowers()
+	utils.SortInplace[polycule](poly.data, polycule_cmp)
 	if minp >= 0 && maxp == 2 {
-		a := this.GetPowerCoefficient(2).ToComplex()
-		b := this.GetPowerCoefficient(1).ToComplex()
-		c := this.GetPowerCoefficient(0).ToComplex()
+		a := poly.GetPowerCoefficient(2).ToComplex()
+		b := poly.GetPowerCoefficient(1).ToComplex()
+		c := poly.GetPowerCoefficient(0).ToComplex()
 		out := make([]complex128, 2)
 		out[0] = (-b - cmplx.Sqrt(b*b-4*a*c)) / (2 * a)
 		out[1] = (-b + cmplx.Sqrt(b*b-4*a*c)) / (2 * a)
@@ -242,7 +239,7 @@ func (this Polynomial) FindZeros() []complex128 {
 	zeros := make([]complex128, 0)
 	num_zeros := maxp - minp
 	for len(zeros) < num_zeros {
-		tmp := this.FindZero(utils.RandomComplex())
+		tmp := poly.FindZero(utils.RandomComplex())
 		if !cmplxContains(zeros, tmp) {
 			zeros = append(zeros, tmp)
 		}

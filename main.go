@@ -1,8 +1,9 @@
 package main
 
 import (
+	"fmt"
 	autopsy "matrix/Autopsy"
-	al "matrix/algebra"
+	"matrix/La"
 	"matrix/utils"
 )
 
@@ -39,13 +40,22 @@ const count = 1000000
 */
 func main() {
 	autopsy.Init()
-	poly := al.PolynomialFromString("7x^5-2x^4+x-3")
-	println(poly.ToString())
-	roots := poly.FindZeros()
-	for i := 0; i < len(roots); i++ {
-		println("root:", utils.FormatComplex(roots[i]))
-		println("value:", utils.FormatComplex(poly.EvaluateComplex(roots[i])))
+	for i := 0; i < 1; i++ {
+		mat := La.RandomMatrix(2, 2)
+		fmt.Printf("%s", mat.ToString())
+		eigs := mat.EigenValues()
+		for j := 0; j < len(eigs); j++ {
+			fmt.Printf("%s,", utils.FormatComplex(eigs[j]))
+		}
 		println()
+		vecs := mat.EigenVectors()
+		for j := 0; j < len(vecs); j++ {
+
+			println(vecs[j].ToString())
+		}
 	}
+
+	//poly := al.PolynomialFromString("7x^5-2x^4+x-3")
+
 	return
 }

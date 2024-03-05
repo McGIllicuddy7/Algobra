@@ -79,6 +79,8 @@ func (this *Matrix) AddRows(r0 int, r1 int, s fr.Fraction) {
 		this.Set(i, r1, fr.Add(tmp0, this.Get(i, r1)))
 	}
 }
+
+// subtracts r0 from r1
 func (this *Matrix) SubRows(r0 int, r1 int, s fr.Fraction) {
 	for i := 0; i < this.width; i++ {
 		tmp0 := fr.Mult(this.Get(i, r0), s)
@@ -158,6 +160,17 @@ func MatrixRowReduce(matrx Matrix) Matrix {
 		}
 	}
 	return mtrx
+}
+func MatrixFromInts(slice [][]int) Matrix {
+	height := len(slice)
+	width := len(slice[0])
+	out := Matrix{make([]fr.Fraction, height*width), height, width}
+	for y := 0; y < height; y++ {
+		for x := 0; x < width; x++ {
+			out.Set(x, y, fr.FromInt(slice[y][x]))
+		}
+	}
+	return out
 }
 func MatrixPairRowReduce(source Matrix, target Matrix) (Matrix, Matrix) {
 	mtrx := source.Clone()
@@ -245,6 +258,118 @@ func RandomMatrix(height int, width int) Matrix {
 		for x := 0; x < width; x++ {
 			out.Set(x, y, fr.FromInt(int(rand.Int31()%10-5)))
 		}
+	}
+	return out
+}
+func (this *Matrix) ToUpperTriangular() Matrix {
+	mtrx := this.Clone()
+	for i := 0; i < mtrx.width; i++ {
+		r := i
+		degen := false
+		for fr.Equals(mtrx.Get(i, r), fr.FromInt(0)) {
+			r++
+			if r >= mtrx.height {
+				degen = true
+				break
+			}
+		}
+		if degen {
+			continue
+		}
+		if r != i {
+			mtrx.SwapRows(r, i)
+		}
+		v := mtrx.Get(i, i)
+		mtrx.ScaleRow(i, fr.Recip(v))
+		for j := r; j < mtrx.height; j++ {
+			if j == i {
+				continue
+			}
+			mlt := mtrx.Get(i, j)
+			mtrx.SubRows(i, j, mlt)
+		}
+	}
+	return mtrx
+}
+func (this *Matrix) Solve(values Vector) Vector {
+	mtrx := this.Clone()
+	vals := values.Clone()
+	for i := 0; i < mtrx.width; i++ {
+		r := i
+		degen := false
+		for fr.Equals(mtrx.Get(i, r), fr.FromInt(0)) {
+			r++
+			if r >= mtrx.height {
+				degen = true
+				break
+			}
+		}
+		if degen {
+			continue
+		}
+		if r != i {
+			mtrx.SwapRows(r, i)
+			vals.Swap(r, i)
+		}
+		v := mtrx.Get(i, i)
+		recip := fr.Recip(v)
+		mtrx.ScaleRow(i, recip)
+		vals[i] *= recip.ToComplex()
+		for j := r; j < mtrx.height; j++ {
+			if j == i {
+				continue
+			}
+			mlt := mtrx.Get(i, j)
+			mtrx.SubRows(i, j, mlt)
+			vals[j] -= vals[i] * mlt.ToComplex()
+		}
+	}
+	symbolTable := make(Vector, this.width)
+	definedSymbols := make([]bool, this.width)
+	for i := 0; i < len(symbolTable); i++ {
+		symbolTable[i] = 0
+		definedSymbols[i] = false
+	}
+	for y := this.height - 1; y >= 0; y-- {
+		syms := make([]int, 0)
+		for x := 0; x < this.width; x++ {
+			if !(fr.Equals(mtrx.Get(x, y), fr.FromInt(0))) {
+				syms = append(syms, x)
+			}
+		}
+		undefined := make([]int, 0)
+		for i := 0; i < len(syms); i++ {
+			if !definedSymbols[syms[i]] {
+				undefined = append(undefined, syms[i])
+			}
+		}
+		for i := len(undefined) - 1; i > 0; i-- {
+			idx := undefined[i]
+			symbolTable[idx] = 1
+			definedSymbols[idx] = true
+		}
+		if len(undefined) > 0 {
+			//println(undefined[0])
+			newSym := complex128(0)
+			for i := 1; i < len(syms); i++ {
+				newSym -= symbolTable[syms[i]] * this.Get(syms[i], y).ToComplex()
+			}
+			newSym += vals[y]
+			newSym /= mtrx.Get(undefined[0], y).ToComplex()
+			symbolTable[undefined[0]] = newSym
+			definedSymbols[undefined[0]] = true
+		}
+	}
+	return symbolTable
+}
+func (this *Matrix) MultByVector(v Vector) Vector {
+	out := make(Vector, len(v))
+	for i := 0; i < this.height; i++ {
+		total := complex128(0)
+		for j := 0; j < this.width; j++ {
+			total += this.Get(j, i).ToComplex() * v[j]
+		}
+		out[i] = total
 	}
 	return out
 }

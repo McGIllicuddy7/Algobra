@@ -115,3 +115,21 @@ func (this PolyMatrix) CharacteristicPolynomial() al.Polynomial {
 	}
 	return out
 }
+func (this *Matrix) EigenValues() []complex128 {
+	eigen := this.ToEigenMatrix()
+	poly := eigen.CharacteristicPolynomial()
+	return poly.FindZeros()
+}
+func (this *Matrix) EigenVectors() []Vector {
+	eigens := this.EigenValues()
+	out := make([]Vector, 0)
+	for i := 0; i < len(eigens); i++ {
+		mat := MatrixSub(*this, MatrixScale(Identity(this.height), fr.FromFloat(real(eigens[i]))))
+		tmp := mat.Solve(ZeroVector(this.height))
+		if !VectorEqual(mat.MultByVector(tmp), ZeroVector(this.height)) {
+			println("failed")
+		}
+		out = append(out, tmp)
+	}
+	return out
+}

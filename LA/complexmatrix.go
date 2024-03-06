@@ -284,38 +284,9 @@ func (tmat *MatrixComplex) ToUpperTriangular() MatrixComplex {
 	return mtrx
 }
 func (tmat *MatrixComplex) Solve(values Vector) Vector {
-	mtrx := tmat.Clone()
+	mtrx := tmat.ToUpperTriangular()
+	println("upper trianguler:\n", mtrx.ToString())
 	vals := values.Clone()
-	for i := 0; i < mtrx.width; i++ {
-		r := i
-		degen := false
-		for mtrx.Get(i, r) == 0 {
-			r++
-			if r >= mtrx.height {
-				degen = true
-				break
-			}
-		}
-		if degen {
-			continue
-		}
-		if r != i {
-			mtrx.SwapRows(r, i)
-			vals.Swap(r, i)
-		}
-		v := mtrx.Get(i, i)
-		recip := 1 / v
-		mtrx.ScaleRow(i, recip)
-		vals[i] *= recip
-		for j := r; j < mtrx.height; j++ {
-			if j == i {
-				continue
-			}
-			mlt := mtrx.Get(i, j)
-			mtrx.SubRows(i, j, mlt)
-			vals[j] -= vals[i] * mlt
-		}
-	}
 	symbolTable := make(Vector, tmat.width)
 	definedSymbols := make([]bool, tmat.width)
 	for i := 0; i < len(symbolTable); i++ {
@@ -325,7 +296,7 @@ func (tmat *MatrixComplex) Solve(values Vector) Vector {
 	for y := tmat.height - 1; y >= 0; y-- {
 		syms := make([]int, 0)
 		for x := 0; x < tmat.width; x++ {
-			if mtrx.Get(x, y) == 0 {
+			if mtrx.Get(x, y) != 0 {
 				syms = append(syms, x)
 			}
 		}
@@ -335,23 +306,24 @@ func (tmat *MatrixComplex) Solve(values Vector) Vector {
 				undefined = append(undefined, syms[i])
 			}
 		}
-		for i := len(undefined) - 1; i > 0; i-- {
+		for i := 0; i < len(undefined)-1; i++ {
 			idx := undefined[i]
 			symbolTable[idx] = 1
 			definedSymbols[idx] = true
 		}
 		if len(undefined) > 0 {
-			//println(undefined[0])
 			newSym := complex128(0)
-			for i := 1; i < len(syms); i++ {
-				newSym -= symbolTable[syms[i]] * tmat.Get(syms[i], y)
+			for i := 0; i < len(syms)-1; i++ {
+				newSym += symbolTable[syms[i]] * tmat.Get(syms[i], y)
 			}
 			newSym += vals[y]
-			newSym /= mtrx.Get(undefined[0], y)
-			symbolTable[undefined[0]] = newSym
-			definedSymbols[undefined[0]] = true
+			tmp_idx := undefined[len(undefined)-1]
+			newSym *= mtrx.Get(tmp_idx, y)
+			symbolTable[tmp_idx] = newSym
+			definedSymbols[tmp_idx] = true
 		}
 	}
+	symbolTable.Reverse()
 	return symbolTable
 }
 func (tmat *MatrixComplex) MultByVector(v Vector) Vector {

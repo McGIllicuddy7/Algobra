@@ -126,9 +126,10 @@ func (tmat *Matrix) EigenVectors() []Vector {
 	for i := 0; i < len(eigens); i++ {
 		mat := ComplexMatrixSub(tmat.ToComplex(), ComplexMatrixScale(ComplexIdentity(tmat.height), eigens[i]))
 		tmp := mat.Solve(ZeroVector(tmat.height))
-		if !VectorEqual(mat.MultByVector(tmp), ZeroVector(tmat.height)) {
+		if !VectorEqual(tmat.MultByVector(tmp), ZeroVector(tmat.height)) {
 			println("failed")
 		}
+		println(tmp.ToString())
 		out = append(out, tmp)
 	}
 	return out

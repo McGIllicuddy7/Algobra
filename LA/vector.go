@@ -45,3 +45,11 @@ func VectorEqual(a Vector, b Vector) bool {
 	}
 	return true
 }
+func (vec *Vector) Reverse() {
+	for i := 0; i < len(*vec)/2; i++ {
+		tmp := (*vec)[i]
+		idx := len(*vec) - i - 1
+		(*vec)[i] = (*vec)[idx]
+		(*vec)[idx] = tmp
+	}
+}

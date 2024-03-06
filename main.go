@@ -1,10 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"math/rand"
 	autopsy "matrix/Autopsy"
 	"matrix/La"
-	"matrix/utils"
 )
 
 const count = 1000000
@@ -38,24 +37,12 @@ const count = 1000000
 		return out
 	}
 */
+func new_int() int {
+	return int(rand.Int31()%10 - 5)
+}
 func main() {
 	autopsy.Init()
-	for i := 0; i < 1; i++ {
-		mat := La.RandomMatrix(2, 2)
-		fmt.Printf("%s", mat.ToString())
-		eigs := mat.EigenValues()
-		for j := 0; j < len(eigs); j++ {
-			fmt.Printf("%s,", utils.FormatComplex(eigs[j]))
-		}
-		println()
-		vecs := mat.EigenVectors()
-		for j := 0; j < len(vecs); j++ {
-
-			println(vecs[j].ToString())
-		}
-	}
-
-	//poly := al.PolynomialFromString("7x^5-2x^4+x-3")
-
-	return
+	mat := La.ComplexMatrixFromInts([][]int{{new_int(), new_int()}, {0, 0}})
+	vs := mat.Solve(La.ZeroVector(2))
+	println(vs.ToString())
 }

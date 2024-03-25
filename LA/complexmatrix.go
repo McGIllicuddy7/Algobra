@@ -286,7 +286,6 @@ func (tmat *MatrixComplex) ToUpperTriangular() MatrixComplex {
 func (tmat *MatrixComplex) Solve(values Vector) Vector {
 	mtrx := tmat.ToUpperTriangular()
 	println("upper trianguler:\n", mtrx.ToString())
-	vals := values.Clone()
 	symbolTable := make(Vector, tmat.width)
 	definedSymbols := make([]bool, tmat.width)
 	for i := 0; i < len(symbolTable); i++ {
@@ -316,7 +315,7 @@ func (tmat *MatrixComplex) Solve(values Vector) Vector {
 			for i := 0; i < len(syms)-1; i++ {
 				newSym += symbolTable[syms[i]] * tmat.Get(syms[i], y)
 			}
-			newSym += vals[y]
+			newSym += values[y]
 			tmp_idx := undefined[len(undefined)-1]
 			newSym *= mtrx.Get(tmp_idx, y)
 			symbolTable[tmp_idx] = newSym

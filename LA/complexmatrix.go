@@ -258,7 +258,7 @@ func (tmat *MatrixComplex) ToUpperTriangular() MatrixComplex {
 	for i := 0; i < mtrx.width; i++ {
 		r := i
 		degen := false
-		for mtrx.Get(i, r) == 0 {
+		for utils.ComplexNearlyEqual(mtrx.Get(i, r), 0) {
 			r++
 			if r >= mtrx.height {
 				degen = true
@@ -284,7 +284,7 @@ func (tmat *MatrixComplex) ToUpperTriangular() MatrixComplex {
 	for i := 0; i < mtrx.width; i++ {
 		r := i
 		degen := false
-		for mtrx.Get(i, r) == 0 {
+		for utils.ComplexNearlyEqual(mtrx.Get(i, r), 0) {
 			r++
 			if r >= mtrx.height {
 				degen = true

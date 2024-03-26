@@ -2,6 +2,7 @@ package La
 
 import (
 	fr "Algobra/fractions"
+	"Algobra/utils"
 	"math/rand"
 )
 
@@ -285,11 +286,6 @@ func (tmat *Matrix) ToUpperTriangular() Matrix {
 			mtrx.SubRows(i, j, mlt)
 		}
 	}
-	return mtrx
-}
-func (tmat *Matrix) Solve(values Vector) Vector {
-	mtrx := tmat.Clone()
-	vals := values.Clone()
 	for i := 0; i < mtrx.width; i++ {
 		r := i
 		degen := false
@@ -305,56 +301,54 @@ func (tmat *Matrix) Solve(values Vector) Vector {
 		}
 		if r != i {
 			mtrx.SwapRows(r, i)
-			vals.Swap(r, i)
 		}
 		v := mtrx.Get(i, i)
-		recip := fr.Recip(v)
-		mtrx.ScaleRow(i, recip)
-		vals[i] *= recip.ToComplex()
+		mtrx.ScaleRow(i, fr.Recip(v))
 		for j := r; j < mtrx.height; j++ {
 			if j == i {
 				continue
 			}
 			mlt := mtrx.Get(i, j)
 			mtrx.SubRows(i, j, mlt)
-			vals[j] -= vals[i] * mlt.ToComplex()
 		}
 	}
-	symbolTable := make(Vector, tmat.width)
-	definedSymbols := make([]bool, tmat.width)
-	for i := 0; i < len(symbolTable); i++ {
-		symbolTable[i] = 0
+	return mtrx
+}
+func (tmat *Matrix) Solve(values Vector) Vector {
+	mtrx := tmat.ToUpperTriangular()
+	definedSymbols := make([]bool, mtrx.width)
+	for i := 0; i < len(definedSymbols); i++ {
 		definedSymbols[i] = false
 	}
-	for y := tmat.height - 1; y >= 0; y-- {
-		syms := make([]int, 0)
-		for x := 0; x < tmat.width; x++ {
-			if !(fr.Equals(mtrx.Get(x, y), fr.FromInt(0))) {
-				syms = append(syms, x)
+	symbolTable := make([]complex128, mtrx.width)
+	for i := 0; i < len(symbolTable); i++ {
+		symbolTable[i] = 0
+	}
+	for y := mtrx.height - 1; y >= 0; y-- {
+		idx := 0
+		for utils.ComplexNearlyEqual(mtrx.Get(idx, y).ToComplex(), 0) || definedSymbols[idx] {
+			idx++
+			if idx >= mtrx.width-1 {
+				break
 			}
 		}
-		undefined := make([]int, 0)
-		for i := 0; i < len(syms); i++ {
-			if !definedSymbols[syms[i]] {
-				undefined = append(undefined, syms[i])
+		if idx == -1 {
+			continue
+		}
+		for i := idx + 1; i < mtrx.width; i++ {
+			if !utils.ComplexNearlyEqual(mtrx.Get(i, y).ToComplex(), 0) && !definedSymbols[i] {
+				symbolTable[i] = 1
+				definedSymbols[i] = true
 			}
 		}
-		for i := len(undefined) - 1; i > 0; i-- {
-			idx := undefined[i]
-			symbolTable[idx] = 1
-			definedSymbols[idx] = true
-		}
-		if len(undefined) > 0 {
-			//println(undefined[0])
-			newSym := complex128(0)
-			for i := 1; i < len(syms); i++ {
-				newSym -= symbolTable[syms[i]] * tmat.Get(syms[i], y).ToComplex()
+		total := complex128(0)
+		for x := 0; x < mtrx.width; x++ {
+			if x != idx {
+				total += mtrx.Get(x, y).ToComplex() * symbolTable[x]
 			}
-			newSym += vals[y]
-			newSym /= mtrx.Get(undefined[0], y).ToComplex()
-			symbolTable[undefined[0]] = newSym
-			definedSymbols[undefined[0]] = true
 		}
+		symbolTable[idx] = -total + values[y]
+		definedSymbols[idx] = true
 	}
 	return symbolTable
 }

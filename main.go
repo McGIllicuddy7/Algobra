@@ -3,10 +3,17 @@ package main
 import (
 	"math/rand"
 	autopsy "matrix/Autopsy"
-	"matrix/La"
+	La "matrix/La"
 )
 
-const count = 1000000
+/*
+#include <stdio.h>
+void Read(char * start, size_t size){
+	fread(stdin, start, size);
+}
+*/
+
+//const count = 1000000
 
 /*
 	func polynomial(x complex128) complex128 {
@@ -40,9 +47,22 @@ const count = 1000000
 func new_int() int {
 	return int(rand.Int31()%10 - 5)
 }
+
 func main() {
 	autopsy.Init()
-	mat := La.ComplexMatrixFromInts([][]int{{new_int(), new_int()}, {0, 0}})
-	vs := mat.Solve(La.ZeroVector(2))
-	println(vs.ToString())
+	for i := 0; i < 40000; i++ {
+		mat := La.RandomComplexMatrix(3, 3)
+		vs := mat.Solve(La.ZeroVector(3))
+		v := mat.MultByVector(vs)
+		if !La.VectorEqual(v, La.ZeroVector(3)) {
+			println("i =", i)
+			autopsy.Dump()
+			//println(mat.ToString())
+			println(vs.ToString())
+			println(v.ToString())
+			panic("failed\n")
+		}
+		autopsy.Reset()
+	}
+	println("Great Success :3")
 }

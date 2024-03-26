@@ -1,9 +1,7 @@
 package La
 
 import (
-	"fmt"
 	"math/rand"
-	autopsy "matrix/Autopsy"
 	"matrix/utils"
 )
 
@@ -313,9 +311,7 @@ func (tmat *MatrixComplex) ToUpperTriangular() MatrixComplex {
 }
 
 func (tmat *MatrixComplex) Solve(values Vector) Vector {
-	autopsy.Store(fmt.Sprintf("matrix:\n%s", tmat.ToString()))
 	mtrx := tmat.ToUpperTriangular()
-	autopsy.Store(fmt.Sprintf("triangular matrix:\n%s", mtrx.ToString()))
 	definedSymbols := make([]bool, mtrx.width)
 	for i := 0; i < len(definedSymbols); i++ {
 		definedSymbols[i] = false

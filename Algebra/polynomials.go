@@ -206,7 +206,7 @@ func (poly Polynomial) FindZero(seed complex128) complex128 {
 restart:
 	for i := 0; i < 10000; i++ {
 		current := poly.EvaluateComplex(value)
-		if cmplx.Abs(current) <= 0.000000001 {
+		if cmplx.Abs(current) <= 0.00001 {
 			return value
 		}
 		delta := der.EvaluateComplex(value)

@@ -1,8 +1,8 @@
 package algebra
 
 import (
+	fr "Algobra/fractions"
 	"fmt"
-	fr "matrix/fractions"
 	"strconv"
 )
 

@@ -1,10 +1,10 @@
 package algebra
 
 import (
+	fr "Algobra/fractions"
+	"Algobra/utils"
 	"errors"
 	"math/cmplx"
-	fr "matrix/fractions"
-	"matrix/utils"
 )
 
 type polycule struct {

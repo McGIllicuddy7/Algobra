@@ -1,8 +1,8 @@
 package La
 
 import (
+	fr "Algobra/fractions"
 	"math/rand"
-	fr "matrix/fractions"
 )
 
 type Matrix struct {

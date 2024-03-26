@@ -1,9 +1,9 @@
 package La
 
 import (
-	al "matrix/algebra"
-	fr "matrix/fractions"
-	"matrix/utils"
+	al "Algobra/algebra"
+	fr "Algobra/fractions"
+	"Algobra/utils"
 )
 
 type PolyMatrix struct {

@@ -1,7 +1,7 @@
 package La
 
 import (
-	"matrix/utils"
+	"Algobra/utils"
 )
 
 type Vector []complex128

@@ -1,8 +1,8 @@
 package La
 
 import (
+	"Algobra/utils"
 	"math/rand"
-	"matrix/utils"
 )
 
 type MatrixComplex struct {

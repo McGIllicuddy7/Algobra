@@ -1,3 +1,3 @@
-module github.com/McGIllicuddy7/Algobra
+module Algobra
 
 go 1.21.3

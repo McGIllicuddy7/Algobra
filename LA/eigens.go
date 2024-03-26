@@ -133,7 +133,7 @@ func (tmat *Matrix) EigenVectors() []Vector {
 		autopsy.Store(tri.ToString())
 		autopsy.Store(tmp.ToString())
 		autopsy.Store(tmat.MultByVector(tmp).ToString())
-		if !VectorEqual(tmat.MultByVector(tmp), ZeroVector(tmat.height)) {
+		if !VectorEqual(mat.MultByVector(tmp), ZeroVector(tmat.height)) {
 			println("failed")
 			autopsy.Dump()
 			os.Exit(1)

@@ -2,6 +2,7 @@ package La
 
 import (
 	"Algobra/utils"
+	"math/cmplx"
 	"math/rand"
 )
 
@@ -258,33 +259,7 @@ func (tmat *MatrixComplex) ToUpperTriangular() MatrixComplex {
 	for i := 0; i < mtrx.width; i++ {
 		r := i
 		degen := false
-		for utils.ComplexNearlyEqual(mtrx.Get(i, r), 0) {
-			r++
-			if r >= mtrx.height {
-				degen = true
-				break
-			}
-		}
-		if degen {
-			continue
-		}
-		if r != i {
-			mtrx.SwapRows(r, i)
-		}
-		v := mtrx.Get(i, i)
-		mtrx.ScaleRow(i, 1/v)
-		for j := r; j < mtrx.height; j++ {
-			if j == i {
-				continue
-			}
-			mlt := mtrx.Get(i, j)
-			mtrx.SubRows(i, j, mlt)
-		}
-	}
-	for i := 0; i < mtrx.width; i++ {
-		r := i
-		degen := false
-		for utils.ComplexNearlyEqual(mtrx.Get(i, r), 0) {
+		for cmplx.Abs(mtrx.Get(i, r)) < 0.01 {
 			r++
 			if r >= mtrx.height {
 				degen = true

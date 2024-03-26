@@ -1,9 +1,11 @@
 package La
 
 import (
+	autopsy "Algobra/Autopsy"
 	al "Algobra/algebra"
 	fr "Algobra/fractions"
 	"Algobra/utils"
+	"os"
 )
 
 type PolyMatrix struct {
@@ -126,11 +128,18 @@ func (tmat *Matrix) EigenVectors() []Vector {
 	for i := 0; i < len(eigens); i++ {
 		mat := ComplexMatrixSub(tmat.ToComplex(), ComplexMatrixScale(ComplexIdentity(tmat.height), eigens[i]))
 		tmp := mat.Solve(ZeroVector(tmat.height))
+		autopsy.Store(mat.ToString())
+		tri := mat.ToUpperTriangular()
+		autopsy.Store(tri.ToString())
+		autopsy.Store(tmp.ToString())
+		autopsy.Store(tmat.MultByVector(tmp).ToString())
 		if !VectorEqual(tmat.MultByVector(tmp), ZeroVector(tmat.height)) {
 			println("failed")
+			autopsy.Dump()
+			os.Exit(1)
 		}
-		println(tmp.ToString())
 		out = append(out, tmp)
+		autopsy.Reset()
 	}
 	return out
 }

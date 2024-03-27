@@ -92,6 +92,8 @@ func (tmat *PolyMatrix) elimRowCollumn(idx int) PolyMatrix {
 }
 
 func (tmat PolyMatrix) CharacteristicPolynomial() al.Polynomial {
+	utils.TimeoutPush("CharacteristicPolynomial")
+	defer utils.TimeoutPop()
 	if tmat.width == 2 && tmat.height == 2 {
 		a := tmat.Get(0, 0)
 		b := tmat.Get(0, 1)
@@ -118,11 +120,15 @@ func (tmat PolyMatrix) CharacteristicPolynomial() al.Polynomial {
 	return out
 }
 func (tmat *Matrix) EigenValues() []complex128 {
+	utils.TimeoutPush("EigenValues")
+	defer utils.TimeoutPop()
 	eigen := tmat.ToEigenMatrix()
 	poly := eigen.CharacteristicPolynomial()
 	return poly.FindZeros()
 }
 func (tmat *Matrix) EigenVectors() []Vector {
+	utils.TimeoutPush("EigenVectors")
+	defer utils.TimeoutPop()
 	eigens := tmat.EigenValues()
 	out := make([]Vector, 0)
 	for i := 0; i < len(eigens); i++ {
